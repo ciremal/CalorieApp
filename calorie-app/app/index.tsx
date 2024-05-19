@@ -1,11 +1,12 @@
-import MealsHome from "@/pages/MealsHome/MealsHome";
-import { Text, View } from "react-native";
 import { PaperProvider } from "react-native-paper";
+import MealsHome from "@/screens/MealsHome/MealsHome";
 
-export default function Index() {
+const Home = () => {
   return (
     <PaperProvider>
       <MealsHome />
     </PaperProvider>
   );
-}
+};
+
+export default Home;
