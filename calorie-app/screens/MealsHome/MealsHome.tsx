@@ -30,49 +30,41 @@ const MealsHome = () => {
 
   const [mealName, setMealName] = useState("");
 
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:5000/getMeals")
-  //     .then((meal) => {
-  //       console.log(meal);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
+  useEffect(() => {
+    axios
+      .get("http://10.0.0.215:5000/meals/getMeals")
+      .then((meal) => {
+        setMeals(meal.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
-  const addMeal = async (
-    name: string,
-    fats: number,
-    carbs: number,
-    proteins: number,
-    cals: number
-  ): Promise<void> => {
+  console.log(meals);
+
+  const addMeal = async (name: string): Promise<void> => {
     const meal = {
       name: name,
-      fats: fats,
-      carbs: carbs,
-      proteins: proteins,
-      cals: cals,
+      fats: 0,
+      carbs: 0,
+      proteins: 0,
+      cals: 0,
     };
-    setMeals([...meals, meal]);
-    hideModal();
-    setMealName("");
 
-    // return await axios
-    //   .post("http://localhost:5000/createMeal", {
-    //     title: name,
-    //     foodItems: [],
-    //   })
-    //   .then((res) => {
-    //     console.log("Success");
-    //     setMeals([...meals, meal]);
-    //     hideModal();
-    //     setMealName("");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    return await axios
+      .post("http://10.0.0.215:5000/meals/createMeal", {
+        title: name,
+      })
+      .then((res) => {
+        console.log("Success");
+        setMeals([...meals, meal]);
+        hideModal();
+        setMealName("");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -89,12 +81,12 @@ const MealsHome = () => {
           <Totals meals={meals} />
           {meals.map((meal) => (
             <MealBox
-              mealName={meal.name}
+              mealName={meal.title}
               fats={meal.fats}
               carbs={meal.carbs}
               proteins={meal.proteins}
               calories={meal.cals}
-              key={meal.name}
+              key={meal.title}
             />
           ))}
           <TouchableOpacity
@@ -134,7 +126,7 @@ const MealsHome = () => {
                   textColor={Colors.black.text}
                   buttonColor={Colors.lightOrange.text}
                   labelStyle={{ fontSize: 18 }}
-                  onPress={() => addMeal(mealName, 0, 0, 0, 0)}
+                  onPress={() => addMeal(mealName)}
                 >
                   Add
                 </PaperButton>

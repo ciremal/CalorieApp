@@ -118,6 +118,7 @@ const MealSummary = () => {
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("Search Food", { mealName: mealName });
+                  hideModal();
                 }}
               >
                 <View style={[pageStyles.addFoodOption, styles.raisedStyle]}>

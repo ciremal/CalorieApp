@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  FlatList,
 } from "react-native";
 import { ActivityIndicator, Divider } from "react-native-paper";
 import { Stack } from "expo-router";
@@ -14,8 +15,7 @@ import { searchFoodStyles as pageStyles } from "./SearchFoodStyles";
 import { useState } from "react";
 import { useFetchFoodData } from "@/hooks/useFetchFoodData";
 import SearchSuggestion from "../../components/SearchSuggestion/SearchSuggestion";
-import { FlatList } from "react-native";
-import { SIZES } from "../../constants/sizes";
+import { SIZES } from "@/constants/sizes";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 const SearchFood = () => {
@@ -34,23 +34,13 @@ const SearchFood = () => {
       .filter((item) => item.label !== undefined);
 
     try {
-      navigation.replace("Food Edit", {
+      navigation.navigate("Food Edit", {
         mealName: mealName,
         foodId: foodId,
         measureId: measureId,
         foodName: foodName,
         measureOptions: JSON.stringify(measureOptions),
       });
-      // router.replace({
-      //   pathname: "/mealEdit",
-      //   params: {
-      //     mealName,
-      //     foodId,
-      //     measureId,
-      //     foodName,
-      //     measureOptions: JSON.stringify(measureOptions),
-      //   },
-      // });
     } catch (error) {
       console.log("Error");
     }

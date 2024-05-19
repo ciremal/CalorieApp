@@ -6,8 +6,29 @@ const mealSchema = mongoose.Schema({
     required: true,
   },
   foodItems: {
-    type: [String],
+    type: [Object],
     required: false,
+    default: [],
+  },
+  cals: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  fats: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  proteins: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  carbs: {
+    type: Number,
+    required: false,
+    default: 0,
   },
 });
 

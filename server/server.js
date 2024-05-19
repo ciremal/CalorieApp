@@ -3,7 +3,7 @@ import express from "express";
 // import { PORT, mongDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
-import { MealModel } from "./models/Meals.js";
+import routes from "./routes/index.js";
 
 const app = express();
 app.use(cors());
@@ -23,28 +23,8 @@ mongoose
 // app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-  res.send({ status: "Started" });
-});
+app.use(routes);
 
 app.listen(5000, () => {
   console.log(`Listening on port ${5000}`);
-});
-
-app.get("/getMeals", async (req, res) => {
-  MealModel.find({})
-    .then(function (users) {
-      res.json(users);
-    })
-    .catch(function (err) {
-      res.json(err);
-    });
-});
-
-app.post("/createMeal", async (req, res) => {
-  const meal = req.body;
-  const newMeal = new MealModel(meal);
-  await newMeal.save();
-
-  res.json(meal);
 });

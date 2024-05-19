@@ -5,6 +5,7 @@ import MealsHome from "@/screens/MealsHome/MealsHome";
 import MealSummary from "@/screens/MealSummary/MealSummary";
 import SearchFood from "@/screens/SearchFood/SearchFood";
 import FoodNutritionEdit from "@/screens/FoodNutritionEdit/FoodNutritionEdit";
+import React from "react";
 
 const Stack = createNativeStackNavigator();
 
@@ -12,7 +13,7 @@ const Home = () => {
   return (
     <NavigationContainer independent={true}>
       <PaperProvider>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName="Meal Home">
           <Stack.Screen name="Meal Home" component={MealsHome} />
           <Stack.Screen name="Meal Summary" component={MealSummary} />
           <Stack.Screen name="Search Food" component={SearchFood} />
