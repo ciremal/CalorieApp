@@ -4,17 +4,20 @@ import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import { mealsStyles as pageStyles } from "./mealSummaryStyles";
+import { mealsStyles as pageStyles } from "./MealSummaryStyles";
 import styles from "../../styles/general";
 import Totals from "../../components/Totals/Totals";
 import { useState, useEffect } from "react";
 import { SIZES } from "../../constants/sizes";
 import FoodItemBox from "../../components/FoodItemBox/FoodItemBox";
 import { FlatList } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const MealSummary = () => {
-  const router = useRouter();
-  const { mealName, newMeal } = useLocalSearchParams();
+  const router = useRoute();
+  const navigation = useNavigation();
+
+  const { mealName, newMeal } = router.params;
   const [visible, setVisible] = useState(false);
 
   const [meals, setMeals] = useState([]);
@@ -45,7 +48,7 @@ const MealSummary = () => {
           headerBackVisible: false,
           headerLeft: () => {
             return (
-              <TouchableOpacity onPress={() => router.back()}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Ionicons
                   name="arrow-back"
                   size={32}
@@ -114,10 +117,7 @@ const MealSummary = () => {
             <View style={pageStyles.modalContentContainer}>
               <TouchableOpacity
                 onPress={() => {
-                  router.push({
-                    pathname: "/searchFood",
-                    params: { mealName },
-                  });
+                  navigation.navigate("Search Food", { mealName: mealName });
                 }}
               >
                 <View style={[pageStyles.addFoodOption, styles.raisedStyle]}>

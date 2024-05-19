@@ -4,9 +4,10 @@ import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SIZES } from "../../constants/sizes";
+import { useNavigation } from "@react-navigation/native";
 
 const MealBox = ({ mealName, fats, carbs, proteins, calories }) => {
-  const router = useRouter();
+  const navigation = useNavigation();
 
   return (
     <View style={mealboxStyles.mealBox}>
@@ -21,11 +22,12 @@ const MealBox = ({ mealName, fats, carbs, proteins, calories }) => {
           {mealName}
         </Text>
         <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/meal",
-              params: { mealName: mealName },
-            })
+          onPress={
+            () => navigation.navigate("Meal Summary", { mealName: mealName })
+            // router.push({
+            //   pathname: "/meal",
+            //   params: { mealName: mealName },
+            // })
           }
         >
           <Ionicons name="add-circle-outline" size={32} color="black" />
