@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   Button,
   SafeAreaView,
+  Text,
 } from "react-native";
 import { Stack } from "expo-router";
 import { mealsHomeStyles as pageStyles } from "./MealsHomeStyles";
@@ -15,57 +16,42 @@ import {
   Portal,
   TextInput,
   Divider,
+  ActivityIndicator,
+  Snackbar,
 } from "react-native-paper";
 import { Colors } from "@/constants/Colors";
-import { useState, useEffect } from "react";
+import { useState, Key } from "react";
 import Totals from "../../components/Totals/Totals";
-import axios from "axios";
+import { useCreateMeal, useGetMeals } from "../../api/meals";
+import { useMutation } from "react-query";
 
 const MealsHome = () => {
-  const [meals, setMeals] = useState<any[]>([]);
-
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
   const [mealName, setMealName] = useState("");
 
-  useEffect(() => {
-    axios
-      .get("http://10.0.0.215:5000/meals/getMeals")
-      .then((meal) => {
-        setMeals(meal.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const { data: meals, isFetching, error, refetch } = useGetMeals();
+  console.log(error);
+  const { mutate } = useMutation({
+    mutationFn: useCreateMeal,
+    onSuccess: () => {
+      hideModal();
+      setMealName("");
+      refetch();
+    },
+  });
 
-  console.log(meals);
-
-  const addMeal = async (name: string): Promise<void> => {
-    const meal = {
-      name: name,
-      fats: 0,
-      carbs: 0,
-      proteins: 0,
-      cals: 0,
-    };
-
-    return await axios
-      .post("http://10.0.0.215:5000/meals/createMeal", {
-        title: name,
-      })
-      .then((res) => {
-        console.log("Success");
-        setMeals([...meals, meal]);
-        hideModal();
-        setMealName("");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const addMeal = async (title: string): Promise<void> => {
+    mutate(title);
   };
+
+  const [snackbarvisible, setSnackbarVisible] = useState(true);
+
+  const onToggleSnackBar = () => setSnackbarVisible(!visible);
+
+  const onDismissSnackBar = () => setSnackbarVisible(false);
 
   return (
     <SafeAreaView style={styles.body}>
@@ -78,61 +64,76 @@ const MealsHome = () => {
       />
       <ScrollView>
         <View style={pageStyles.container}>
-          <Totals meals={meals} />
-          {meals.map((meal) => (
-            <MealBox
-              mealName={meal.title}
-              fats={meal.fats}
-              carbs={meal.carbs}
-              proteins={meal.proteins}
-              calories={meal.cals}
-              key={meal.title}
-            />
-          ))}
-          <TouchableOpacity
-            activeOpacity={0.5}
-            style={{ marginVertical: "10%" }}
-            onPress={() => showModal()}
-          >
-            <PaperButton
-              mode="elevated"
-              textColor={Colors.black.text}
-              buttonColor={Colors.lightOrange.text}
-              labelStyle={{ fontSize: 18 }}
-              style={pageStyles.addMealButton}
-            >
-              Add Meal
-            </PaperButton>
-          </TouchableOpacity>
-          <Portal>
-            <Modal
-              visible={visible}
-              onDismiss={hideModal}
-              contentContainerStyle={pageStyles.modal}
-            >
-              <View style={pageStyles.modalContentContainer}>
-                <TextInput
-                  label={"Meal Name"}
-                  value={mealName}
-                  mode="outlined"
-                  style={pageStyles.textInput}
-                  outlineColor={Colors.orange.text}
-                  activeOutlineColor={Colors.lightOrange.text}
-                  textColor={Colors.black.text}
-                  onChangeText={(text) => setMealName(text)}
-                />
+          {isFetching && (
+            <ActivityIndicator animating={true} color={Colors.orange.text} />
+          )}
+          {meals && (
+            <>
+              <Totals meals={meals} />
+              {meals.map(
+                (meal: {
+                  title: Key | null | undefined;
+                  fats: any;
+                  carbs: any;
+                  proteins: any;
+                  cals: any;
+                }) => (
+                  <MealBox
+                    mealName={meal.title}
+                    fats={meal.fats}
+                    carbs={meal.carbs}
+                    proteins={meal.proteins}
+                    calories={meal.cals}
+                    key={meal.title}
+                  />
+                )
+              )}
+              <TouchableOpacity
+                activeOpacity={0.5}
+                style={{ marginVertical: "10%" }}
+                onPress={() => showModal()}
+              >
                 <PaperButton
-                  mode="contained"
+                  mode="elevated"
                   textColor={Colors.black.text}
                   buttonColor={Colors.lightOrange.text}
                   labelStyle={{ fontSize: 18 }}
-                  onPress={() => addMeal(mealName)}
+                  style={pageStyles.addMealButton}
                 >
-                  Add
+                  Add Meal
                 </PaperButton>
-              </View>
-            </Modal>
-          </Portal>
+              </TouchableOpacity>
+              <Portal>
+                <Modal
+                  visible={visible}
+                  onDismiss={hideModal}
+                  contentContainerStyle={pageStyles.modal}
+                >
+                  <View style={pageStyles.modalContentContainer}>
+                    <TextInput
+                      label={"Meal Name"}
+                      value={mealName}
+                      mode="outlined"
+                      style={pageStyles.textInput}
+                      outlineColor={Colors.orange.text}
+                      activeOutlineColor={Colors.lightOrange.text}
+                      textColor={Colors.black.text}
+                      onChangeText={(text) => setMealName(text)}
+                    />
+                    <PaperButton
+                      mode="contained"
+                      textColor={Colors.black.text}
+                      buttonColor={Colors.lightOrange.text}
+                      labelStyle={{ fontSize: 18 }}
+                      onPress={() => addMeal(mealName)}
+                    >
+                      Add
+                    </PaperButton>
+                  </View>
+                </Modal>
+              </Portal>
+            </>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

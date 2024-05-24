@@ -30,6 +30,10 @@ const mealSchema = mongoose.Schema({
     required: false,
     default: 0,
   },
+  createdAt: {
+    type: Date,
+    default: new Date(),
+  },
 });
 
 export const MealModel = mongoose.model("Meal", mealSchema, "Meals");
