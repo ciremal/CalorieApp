@@ -16,16 +16,16 @@ const Home = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer independent={true}>
-        {/* <NativeBaseProvider> */}
-        <PaperProvider>
-          <Stack.Navigator initialRouteName="Meal Home">
-            <Stack.Screen name="Meal Home" component={MealsHome} />
-            <Stack.Screen name="Meal Summary" component={MealSummary} />
-            <Stack.Screen name="Search Food" component={SearchFood} />
-            <Stack.Screen name="Food Edit" component={FoodNutritionEdit} />
-          </Stack.Navigator>
-        </PaperProvider>
-        {/* </NativeBaseProvider> */}
+        <NativeBaseProvider>
+          <PaperProvider>
+            <Stack.Navigator initialRouteName="Meal Home">
+              <Stack.Screen name="Meal Home" component={MealsHome} />
+              <Stack.Screen name="Meal Summary" component={MealSummary} />
+              <Stack.Screen name="Search Food" component={SearchFood} />
+              <Stack.Screen name="Food Edit" component={FoodNutritionEdit} />
+            </Stack.Navigator>
+          </PaperProvider>
+        </NativeBaseProvider>
       </NavigationContainer>
     </QueryClientProvider>
   );

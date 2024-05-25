@@ -1,6 +1,6 @@
 import { SafeAreaView, View, TouchableOpacity } from "react-native";
 import { Divider, Button, Text, Portal, Modal } from "react-native-paper";
-import { Stack, useRouter, useLocalSearchParams } from "expo-router";
+import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
@@ -12,12 +12,14 @@ import { SIZES } from "../../constants/sizes";
 import FoodItemBox from "../../components/FoodItemBox/FoodItemBox";
 import { FlatList } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useMutation, useQueryClient } from "react-query";
+import { useDeleteMeal } from "@/api/meals";
 
 const MealSummary = () => {
   const router = useRoute();
   const navigation = useNavigation();
 
-  const { mealName, newMeal } = router.params;
+  const { meal, newMeal } = router.params;
   const [visible, setVisible] = useState(false);
 
   const [meals, setMeals] = useState([]);
@@ -25,6 +27,8 @@ const MealSummary = () => {
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
+
+  const { _id: id, title } = meal;
 
   useEffect(() => {
     if (newMeal) {
@@ -38,12 +42,21 @@ const MealSummary = () => {
     setMealsTotals(result);
   }, [meals]);
 
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: useDeleteMeal,
+    onSuccess: async () => {
+      await queryClient.refetchQueries("getMeals", { active: true });
+      navigation.navigate("Meal Home");
+    },
+  });
+
   return (
     <SafeAreaView style={styles.body}>
       <Divider style={styles.divider} />
       <Stack.Screen
         options={{
-          headerTitle: mealName,
+          headerTitle: title,
           headerStyle: styles.header,
           headerBackVisible: false,
           headerLeft: () => {
@@ -59,7 +72,7 @@ const MealSummary = () => {
           },
           headerRight: () => {
             return (
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => mutate(id)}>
                 <FontAwesome
                   name="trash-o"
                   size={32}

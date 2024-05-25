@@ -2,12 +2,13 @@ import { View, Text, TouchableOpacity } from "react-native";
 import mealboxStyles from "./mealboxStyles";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { SIZES } from "../../constants/sizes";
 import { useNavigation } from "@react-navigation/native";
 
-const MealBox = ({ mealName, fats, carbs, proteins, calories }) => {
+const MealBox = ({ meal }) => {
   const navigation = useNavigation();
+
+  const { cals, carbs, proteins, fats, title } = meal;
 
   return (
     <View style={mealboxStyles.mealBox}>
@@ -19,16 +20,10 @@ const MealBox = ({ mealName, fats, carbs, proteins, calories }) => {
             fontWeight: "600",
           }}
         >
-          {mealName}
+          {title}
         </Text>
         <TouchableOpacity
-          onPress={
-            () => navigation.navigate("Meal Summary", { mealName: mealName })
-            // router.push({
-            //   pathname: "/meal",
-            //   params: { mealName: mealName },
-            // })
-          }
+          onPress={() => navigation.navigate("Meal Summary", { meal: meal })}
         >
           <Ionicons name="add-circle-outline" size={32} color="black" />
         </TouchableOpacity>
@@ -38,7 +33,7 @@ const MealBox = ({ mealName, fats, carbs, proteins, calories }) => {
         <Text style={mealboxStyles.nutritionNumber}>{fats}</Text>
         <Text style={mealboxStyles.nutritionNumber}>{carbs}</Text>
         <Text style={mealboxStyles.nutritionNumber}>{proteins}</Text>
-        <Text style={mealboxStyles.nutritionNumberCalorie}>{calories}</Text>
+        <Text style={mealboxStyles.nutritionNumberCalorie}>{cals}</Text>
       </View>
     </View>
   );

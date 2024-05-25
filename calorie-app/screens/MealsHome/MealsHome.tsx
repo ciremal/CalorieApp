@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   Button,
   SafeAreaView,
-  Text,
 } from "react-native";
 import { Stack } from "expo-router";
 import { mealsHomeStyles as pageStyles } from "./MealsHomeStyles";
@@ -17,13 +16,13 @@ import {
   TextInput,
   Divider,
   ActivityIndicator,
-  Snackbar,
 } from "react-native-paper";
 import { Colors } from "@/constants/Colors";
-import { useState, Key } from "react";
+import { useEffect, useState } from "react";
 import Totals from "../../components/Totals/Totals";
 import { useCreateMeal, useGetMeals } from "../../api/meals";
 import { useMutation } from "react-query";
+import { ErrorAlert } from "@/components/Alerts/Alerts";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
@@ -33,7 +32,6 @@ const MealsHome = () => {
   const [mealName, setMealName] = useState("");
 
   const { data: meals, isFetching, error, refetch } = useGetMeals();
-  console.log(error);
   const { mutate } = useMutation({
     mutationFn: useCreateMeal,
     onSuccess: () => {
@@ -47,47 +45,30 @@ const MealsHome = () => {
     mutate(title);
   };
 
-  const [snackbarvisible, setSnackbarVisible] = useState(true);
-
-  const onToggleSnackBar = () => setSnackbarVisible(!visible);
-
-  const onDismissSnackBar = () => setSnackbarVisible(false);
-
   return (
     <SafeAreaView style={styles.body}>
       <Divider style={styles.divider} />
       <Stack.Screen
         options={{
-          headerStyle: styles.header,
           headerTitle: () => <Button title="Today" color={"#000000"} />,
         }}
       />
       <ScrollView>
         <View style={pageStyles.container}>
+          {error && (
+            <ErrorAlert
+              message={"Could not load meals. Please try again later"}
+            />
+          )}
           {isFetching && (
             <ActivityIndicator animating={true} color={Colors.orange.text} />
           )}
           {meals && (
             <>
               <Totals meals={meals} />
-              {meals.map(
-                (meal: {
-                  title: Key | null | undefined;
-                  fats: any;
-                  carbs: any;
-                  proteins: any;
-                  cals: any;
-                }) => (
-                  <MealBox
-                    mealName={meal.title}
-                    fats={meal.fats}
-                    carbs={meal.carbs}
-                    proteins={meal.proteins}
-                    calories={meal.cals}
-                    key={meal.title}
-                  />
-                )
-              )}
+              {meals.map((meal: any) => (
+                <MealBox meal={meal} key={meal.title} />
+              ))}
               <TouchableOpacity
                 activeOpacity={0.5}
                 style={{ marginVertical: "10%" }}
