@@ -130,7 +130,7 @@ const MealSummary = () => {
             <View style={pageStyles.modalContentContainer}>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Search Food", { mealName: mealName });
+                  navigation.navigate("Search Food", { mealName: title });
                   hideModal();
                 }}
               >

@@ -18,11 +18,12 @@ import {
   ActivityIndicator,
 } from "react-native-paper";
 import { Colors } from "@/constants/Colors";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Totals from "../../components/Totals/Totals";
 import { useCreateMeal, useGetMeals } from "../../api/meals";
 import { useMutation } from "react-query";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
+import { Feather } from "@expo/vector-icons";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
@@ -51,6 +52,13 @@ const MealsHome = () => {
       <Stack.Screen
         options={{
           headerTitle: () => <Button title="Today" color={"#000000"} />,
+          headerRight: () => {
+            return (
+              <TouchableOpacity onPress={() => showModal()}>
+                <Feather name="plus" size={32} color={Colors.orange.text} />
+              </TouchableOpacity>
+            );
+          },
         }}
       />
       <ScrollView>
@@ -69,7 +77,7 @@ const MealsHome = () => {
               {meals.map((meal: any) => (
                 <MealBox meal={meal} key={meal.title} />
               ))}
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 activeOpacity={0.5}
                 style={{ marginVertical: "10%" }}
                 onPress={() => showModal()}
@@ -83,7 +91,7 @@ const MealsHome = () => {
                 >
                   Add Meal
                 </PaperButton>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <Portal>
                 <Modal
                   visible={visible}
