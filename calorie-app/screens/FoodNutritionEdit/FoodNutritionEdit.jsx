@@ -150,7 +150,7 @@ const FoodNutritionEdit = () => {
               <ActivityIndicator
                 animating={true}
                 color={Colors.lightOrange.text}
-                size={SIZES.xxlg}
+                size={SIZES.xl3}
               />
             ) : (
               <View

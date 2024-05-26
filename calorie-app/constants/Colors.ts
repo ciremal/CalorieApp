@@ -38,4 +38,7 @@ export const Colors = {
   grey: {
     text: "#D0D0D0"
   },
+  error:{
+    text: "#FECACA"
+  }
 };

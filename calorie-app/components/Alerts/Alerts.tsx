@@ -1,25 +1,12 @@
-import {
-  Alert,
-  CloseIcon,
-  HStack,
-  IconButton,
-  Text,
-  VStack,
-} from "native-base";
+import { View, Text } from "react-native";
+import { alertsStyles } from "./AlertsStyles.js";
+import { Entypo } from "@expo/vector-icons";
 
 export const ErrorAlert = (props: { message: String }) => {
   return (
-    <Alert w="100%" status={"error"}>
-      <VStack space={2} flexShrink={1} w="100%">
-        <HStack flexShrink={1} space={2} justifyContent="space-between">
-          <HStack space={2} flexShrink={1} paddingX={3}>
-            <Alert.Icon mt="1" />
-            <Text fontSize="lg" color="coolGray.800">
-              {props.message}
-            </Text>
-          </HStack>
-        </HStack>
-      </VStack>
-    </Alert>
+    <View style={alertsStyles.alertContainer}>
+      <Entypo name="warning" size={24} color="red" />
+      <Text style={alertsStyles.message}>{props.message}</Text>
+    </View>
   );
 };

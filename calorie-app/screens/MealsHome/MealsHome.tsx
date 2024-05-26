@@ -24,6 +24,7 @@ import { useCreateMeal, useGetMeals } from "../../api/meals";
 import { useMutation } from "react-query";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
 import { Feather } from "@expo/vector-icons";
+import { Button as NativeBaseButton } from "native-base";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
@@ -77,21 +78,6 @@ const MealsHome = () => {
               {meals.map((meal: any) => (
                 <MealBox meal={meal} key={meal.title} />
               ))}
-              {/* <TouchableOpacity
-                activeOpacity={0.5}
-                style={{ marginVertical: "10%" }}
-                onPress={() => showModal()}
-              >
-                <PaperButton
-                  mode="elevated"
-                  textColor={Colors.black.text}
-                  buttonColor={Colors.lightOrange.text}
-                  labelStyle={{ fontSize: 18 }}
-                  style={pageStyles.addMealButton}
-                >
-                  Add Meal
-                </PaperButton>
-              </TouchableOpacity> */}
               <Portal>
                 <Modal
                   visible={visible}

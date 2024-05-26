@@ -152,7 +152,7 @@ const MealSummary = () => {
                     >
                       <AntDesign
                         name="search1"
-                        size={SIZES.xxlg}
+                        size={SIZES.xl3}
                         color="black"
                       />
                       <Text style={pageStyles.addFoodOptionText}>Search</Text>
@@ -162,7 +162,7 @@ const MealSummary = () => {
                     <View
                       style={[pageStyles.addFoodOption, styles.raisedStyle]}
                     >
-                      <Entypo name="pencil" size={SIZES.xxlg} color="black" />
+                      <Entypo name="pencil" size={SIZES.xl3} color="black" />
                       <Text style={pageStyles.addFoodOptionText}>Manual</Text>
                     </View>
                   </TouchableOpacity>
