@@ -13,7 +13,7 @@ import FoodItemBox from "../../components/FoodItemBox/FoodItemBox";
 import { FlatList } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useMutation, useQueryClient } from "react-query";
-import { useDeleteMeal } from "@/api/meals";
+import { useDeleteMeal, useGetMealById } from "@/api/meals";
 
 const MealSummary = () => {
   const router = useRoute();
@@ -30,6 +30,21 @@ const MealSummary = () => {
 
   const { _id: id, title } = meal;
 
+  const queryClient = useQueryClient();
+
+  const { data, isFetching, error } = useGetMealById(id);
+  if (!isFetching) {
+    console.log(data);
+  }
+
+  const { mutate } = useMutation({
+    mutationFn: useDeleteMeal,
+    onSuccess: async () => {
+      await queryClient.refetchQueries("getMeals", { active: true });
+      navigation.navigate("Meal Home");
+    },
+  });
+
   useEffect(() => {
     if (newMeal) {
       setMeals([...meals, JSON.parse(newMeal)]);
@@ -41,15 +56,6 @@ const MealSummary = () => {
     const result = meals.map((item) => item.mainNutrients);
     setMealsTotals(result);
   }, [meals]);
-
-  const queryClient = useQueryClient();
-  const { mutate } = useMutation({
-    mutationFn: useDeleteMeal,
-    onSuccess: async () => {
-      await queryClient.refetchQueries("getMeals", { active: true });
-      navigation.navigate("Meal Home");
-    },
-  });
 
   return (
     <SafeAreaView style={styles.body}>
@@ -130,7 +136,7 @@ const MealSummary = () => {
             <View style={pageStyles.modalContentContainer}>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Search Food", { mealName: title });
+                  navigation.navigate("Search Food", { meal: meal });
                   hideModal();
                 }}
               >

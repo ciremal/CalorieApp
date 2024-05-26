@@ -21,7 +21,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 const SearchFood = () => {
   const navigation = useNavigation();
   const router = useRoute();
-  const { mealName } = router.params;
+  const { meal } = router.params;
   const [searchedFood, setSearchedFood] = useState("");
   const [textInputWidth, setTextInputWidth] = useState(0);
   const { data, isLoading, setQuery } = useFetchFoodData();
@@ -35,7 +35,7 @@ const SearchFood = () => {
 
     try {
       navigation.navigate("Food Edit", {
-        mealName: mealName,
+        meal: meal,
         foodId: foodId,
         measureId: measureId,
         foodName: foodName,
@@ -51,7 +51,7 @@ const SearchFood = () => {
       <Divider style={styles.divider} />
       <Stack.Screen
         options={{
-          headerTitle: mealName,
+          headerTitle: meal.title,
           headerStyle: styles.header,
           headerBackVisible: false,
           headerLeft: () => {

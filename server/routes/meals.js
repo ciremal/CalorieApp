@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { MealModel } from "../models/Meals.js";
-import { ObjectId } from "mongodb";
+import roundNumbers from "../helpers/roundNumbers.js";
 
 const router = Router();
 
@@ -10,6 +10,17 @@ router.get("/getMeals", async (req, res) => {
       res.json(meals);
     })
     .catch(function (err) {
+      res.json(err);
+    });
+});
+
+router.post("/getMealById", async (req, res) => {
+  const { id } = req.body;
+  await MealModel.findById(id)
+    .then((meal) => {
+      res.json(meal);
+    })
+    .catch((err) => {
       res.json(err);
     });
 });
@@ -30,6 +41,27 @@ router.post("/deleteMeal", async (req, res) => {
       res.json(meal);
     })
     .catch(function (err) {
+      res.json(err);
+    });
+});
+
+router.post("/updateMealAddFoodItem", async (req, res) => {
+  const { id, foodItem, mainNutrients } = req.body;
+  const { cals, carbs, fats, proteins } = mainNutrients;
+
+  const doc = await MealModel.findById(id);
+  doc.foodItems.push(foodItem);
+  doc.cals = roundNumbers(doc.cals + cals);
+  doc.carbs = roundNumbers(doc.carbs + carbs);
+  doc.fats = roundNumbers(doc.fats + fats);
+  doc.proteins = roundNumbers(doc.proteins + proteins);
+
+  await doc
+    .save()
+    .then((meal) => {
+      res.json(meal);
+    })
+    .catch((err) => {
       res.json(err);
     });
 });

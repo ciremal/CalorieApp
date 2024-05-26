@@ -26,13 +26,15 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { extractNutrientsFromApi } from "../../helpers/nutrientsHelpers";
 import roundNumbers from "../../helpers/roundNumbers";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useUpdateMealAddFoodItem } from "@/api/meals";
+import { useMutation, useQueryClient } from "react-query";
 
 const FoodNutritionEdit = () => {
   const navigation = useNavigation();
   const router = useRoute();
 
   const {
-    mealName,
+    meal,
     foodId,
     measureId,
     foodName: name,
@@ -86,6 +88,20 @@ const FoodNutritionEdit = () => {
     }
   }, [quantity, unitOfMeasurement]);
 
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: useUpdateMealAddFoodItem,
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: ["getMealById", meal._id],
+        active: true,
+      });
+      navigation.navigate("Meal Summary", {
+        meal: meal,
+      });
+    },
+  });
+
   const handleAddFood = () => {
     const mainNutrients = {
       cals: nutrients.find((item) => item.label === "Calories").quantity,
@@ -94,19 +110,16 @@ const FoodNutritionEdit = () => {
       proteins: nutrients.find((item) => item.label === "Proteins").quantity,
     };
 
-    const newMeal = JSON.stringify({
+    const foodItem = {
       name: foodName,
       quantity: quantity,
       unitOfMeasurement: unitOfMeasurement,
       nutrients: nutrients,
       notes: notes,
       mainNutrients: mainNutrients,
-    });
+    };
 
-    navigation.navigate("Meal Summary", {
-      mealName: mealName,
-      newMeal: newMeal,
-    });
+    mutate({ id: meal._id, foodItem: foodItem, mainNutrients: mainNutrients });
   };
 
   return (
@@ -115,7 +128,7 @@ const FoodNutritionEdit = () => {
         <Divider style={styles.divider} />
         <Stack.Screen
           options={{
-            headerTitle: mealName,
+            headerTitle: meal.title,
             headerStyle: styles.header,
             headerBackVisible: false,
             headerLeft: () => {
@@ -233,7 +246,7 @@ const FoodNutritionEdit = () => {
                   labelStyle={{ fontSize: 18 }}
                   onPress={() => handleAddFood()}
                 >
-                  Add to {mealName}
+                  Add to {meal.title}
                 </PaperButton>
               </View>
             )}
