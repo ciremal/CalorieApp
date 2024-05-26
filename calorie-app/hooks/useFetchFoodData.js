@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const app_id = "c6bba2f9";
-const app_key = "039ae1b36c1465f3cf917b986c88038d";
+const app_id = process.env.EXPO_PUBLIC_APP_ID;
+const app_key = process.env.EXPO_PUBLIC_APP_KEY;
 
 export const useFetchFoodData = () => {
   const [data, setData] = useState([]);
