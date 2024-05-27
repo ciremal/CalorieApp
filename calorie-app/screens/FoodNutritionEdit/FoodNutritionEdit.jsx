@@ -92,10 +92,7 @@ const FoodNutritionEdit = () => {
   const { mutate } = useMutation({
     mutationFn: useUpdateMealAddFoodItem,
     onSuccess: async () => {
-      await queryClient.refetchQueries({
-        queryKey: ["getMealById", meal._id],
-        active: true,
-      });
+      await queryClient.refetchQueries();
       navigation.navigate("Meal Summary", {
         meal: meal,
       });

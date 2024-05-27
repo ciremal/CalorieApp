@@ -5,23 +5,26 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Dialog, Portal, Button } from "react-native-paper";
 
 const FoodItemBox = ({
-  foodName,
-  fats,
-  carbs,
-  proteins,
-  calories,
-  quantity,
-  unit,
+  foodItem,
   visible,
   showDialog,
   hideDialog,
   handleDelete,
 }) => {
+  const {
+    _id: id,
+    name,
+    quantity,
+    unitOfMeasurement,
+    mainNutrients,
+  } = foodItem;
+  const { cals, carbs, fats, proteins } = mainNutrients;
+
   return (
     <View style={foodItemBoxStyles.foodBox}>
       <View style={foodItemBoxStyles.foodBoxLayer1}>
         <Text style={foodItemBoxStyles.foodItemTitle}>
-          {`${foodName} (${quantity} ${unit})`}
+          {`${name} (${quantity} ${unitOfMeasurement})`}
         </Text>
         <TouchableOpacity onPress={() => showDialog()}>
           <FontAwesome name="trash-o" size={32} color={Colors.black.text} />
@@ -32,7 +35,7 @@ const FoodItemBox = ({
         <Text style={foodItemBoxStyles.nutritionNumber}>{fats}</Text>
         <Text style={foodItemBoxStyles.nutritionNumber}>{carbs}</Text>
         <Text style={foodItemBoxStyles.nutritionNumber}>{proteins}</Text>
-        <Text style={foodItemBoxStyles.nutritionNumberCalorie}>{calories}</Text>
+        <Text style={foodItemBoxStyles.nutritionNumberCalorie}>{cals}</Text>
       </View>
 
       <Portal>
@@ -46,7 +49,7 @@ const FoodItemBox = ({
               variant="bodyLarge"
               style={{ color: Colors.black.text, textAlign: "center" }}
             >
-              Are you sure you want to delete {foodName} from this meal?
+              Are you sure you want to delete {name} from this meal?
             </Text>
           </Dialog.Content>
           <Dialog.Actions style={{ justifyContent: "center" }}>
@@ -66,7 +69,7 @@ const FoodItemBox = ({
               textColor={Colors.lightWhite.text}
               style={foodItemBoxStyles.dialogButton}
               contentStyle={{ paddingHorizontal: "6%" }}
-              onPress={() => handleDelete()}
+              onPress={() => handleDelete(id)}
             >
               Delete
             </Button>

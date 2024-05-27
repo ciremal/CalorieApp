@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { MealModel } from "../models/Meals.js";
+import { FoodItemModel } from "../models/FoodItem.js";
 import roundNumbers from "../helpers/roundNumbers.js";
+import { ObjectId } from "mongodb";
 
 const router = Router();
 
@@ -17,6 +19,7 @@ router.get("/getMeals", async (req, res) => {
 router.post("/getMealById", async (req, res) => {
   const { id } = req.body;
   await MealModel.findById(id)
+    .populate("foodItems")
     .then((meal) => {
       res.json(meal);
     })
@@ -33,6 +36,13 @@ router.post("/createMeal", async (req, res) => {
   res.json(meal);
 });
 
+router.post("/createFoodItem", async (req, res) => {
+  const foodItem = req.body;
+  const newFoodItem = new FoodItemModel(foodItem);
+  await newFoodItem.save();
+  res.json(foodItem);
+});
+
 router.post("/deleteMeal", async (req, res) => {
   const { id } = req.body;
 
@@ -45,14 +55,35 @@ router.post("/deleteMeal", async (req, res) => {
     });
 });
 
-router.post("/deleteMealFoodItem", async (req, res) => {});
+router.post("/deleteMealFoodItem", async (req, res) => {
+  const { mealId, foodId } = req.body;
+
+  const foodItem = await FoodItemModel.findByIdAndDelete(foodId);
+  let meal = await MealModel.findById(mealId);
+  meal.foodItems = meal.foodItems.filter((item) => item.toString() != foodId);
+
+  const { cals, carbs, fats, proteins } = foodItem.mainNutrients;
+  meal.cals -= cals;
+  meal.carbs -= carbs;
+  meal.fats -= fats;
+  meal.proteins -= proteins;
+
+  await meal
+    .save()
+    .then((res) => res.json(meal))
+    .catch((err) => res.json(err));
+});
 
 router.post("/updateMealAddFoodItem", async (req, res) => {
   const { id, foodItem, mainNutrients } = req.body;
   const { cals, carbs, fats, proteins } = mainNutrients;
 
+  // Create new FoodItem
+  const newFoodItem = new FoodItemModel(foodItem);
+  await newFoodItem.save();
+
   const doc = await MealModel.findById(id);
-  doc.foodItems.push(foodItem);
+  doc.foodItems.push(newFoodItem);
   doc.cals = roundNumbers(doc.cals + cals);
   doc.carbs = roundNumbers(doc.carbs + carbs);
   doc.fats = roundNumbers(doc.fats + fats);
