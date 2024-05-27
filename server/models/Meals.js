@@ -5,11 +5,9 @@ const mealSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  foodItems: {
-    type: [Object],
-    required: false,
-    default: [],
-  },
+  foodItems: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "FoodItem", default: [] },
+  ],
   cals: {
     type: Number,
     required: false,

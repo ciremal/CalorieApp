@@ -31,6 +31,15 @@ export const useDeleteMeal = async (id) => {
     .then((res) => res.data);
 };
 
+export const useDeleteFoodItem = async ({ mealId, foodId }) => {
+  return axios
+    .post(`http://${backendIp}:5000/meals/deleteMealFoodItem`, {
+      mealId,
+      foodId,
+    })
+    .then((res) => res.json);
+};
+
 export const useUpdateMealAddFoodItem = async ({
   id,
   foodItem,

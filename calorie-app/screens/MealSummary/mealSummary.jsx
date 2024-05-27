@@ -21,7 +21,7 @@ import FoodItemBox from "../../components/FoodItemBox/FoodItemBox";
 import { FlatList } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useMutation, useQueryClient } from "react-query";
-import { useDeleteMeal, useGetMealById } from "@/api/meals";
+import { useDeleteFoodItem, useDeleteMeal, useGetMealById } from "@/api/meals";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
 
 const MealSummary = () => {
@@ -46,7 +46,7 @@ const MealSummary = () => {
   const [mealsTotals, setMealsTotals] = useState([]);
 
   const queryClient = useQueryClient();
-  const { data: mealData, isFetching, error } = useGetMealById(id);
+  const { data: mealData, isFetching, error, refetch } = useGetMealById(id);
 
   const { mutate } = useMutation({
     mutationFn: useDeleteMeal,
@@ -56,8 +56,16 @@ const MealSummary = () => {
     },
   });
 
-  const handleDelete = () => {
-    console.log("Item Deleted");
+  const { mutate: deleteFoodItem } = useMutation({
+    mutationFn: useDeleteFoodItem,
+    onSuccess: async () => {
+      refetch(id);
+      await queryClient.refetchQueries("getMeals", { active: true });
+    },
+  });
+
+  const handleDelete = (foodId) => {
+    deleteFoodItem({ mealId: id, foodId: foodId });
     hideDialogFoodItem();
   };
 
@@ -125,13 +133,7 @@ const MealSummary = () => {
                   }}
                 >
                   <FoodItemBox
-                    foodName={item.name}
-                    calories={item.mainNutrients.cals}
-                    fats={item.mainNutrients.fats}
-                    carbs={item.mainNutrients.carbs}
-                    proteins={item.mainNutrients.proteins}
-                    quantity={item.quantity}
-                    unit={item.unitOfMeasurement}
+                    foodItem={item}
                     visible={visibleDialogFoodItem}
                     showDialog={showDialogFoodItem}
                     hideDialog={hideDialogFoodItem}
