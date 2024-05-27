@@ -40,5 +40,8 @@ export const Colors = {
   },
   error:{
     text: "#FECACA"
+  },
+  red: {
+    text: "#df1b1b"
   }
 };

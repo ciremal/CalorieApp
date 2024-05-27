@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { SIZES } from "@/constants/sizes";
 
 export const mealsStyles = StyleSheet.create({
   container: {
@@ -11,8 +12,6 @@ export const mealsStyles = StyleSheet.create({
     marginBottom: "15%",
   },
   addFoodButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
     borderRadius: 50,
     marginTop: 15,
   },
@@ -50,5 +49,14 @@ export const mealsStyles = StyleSheet.create({
   addFoodOptionText: {
     color: Colors.black.text,
     fontSize: 18,
+  },
+
+  dialog: {
+    backgroundColor: Colors.lightWhite.text,
+  },
+
+  dialogButton: {
+    borderColor: Colors.black.text,
+    borderRadius: 5,
   },
 });

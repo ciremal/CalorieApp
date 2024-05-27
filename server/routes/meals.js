@@ -45,6 +45,8 @@ router.post("/deleteMeal", async (req, res) => {
     });
 });
 
+router.post("/deleteMealFoodItem", async (req, res) => {});
+
 router.post("/updateMealAddFoodItem", async (req, res) => {
   const { id, foodItem, mainNutrients } = req.body;
   const { cals, carbs, fats, proteins } = mainNutrients;

@@ -6,6 +6,7 @@ import {
   Portal,
   Modal,
   ActivityIndicator,
+  Dialog,
 } from "react-native-paper";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,9 +31,17 @@ const MealSummary = () => {
   const { meal } = router.params;
   const { _id: id, title } = meal;
 
-  const [visible, setVisible] = useState(false);
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
+  const [visibleModal, setVisibleModal] = useState(false);
+  const showModal = () => setVisibleModal(true);
+  const hideModal = () => setVisibleModal(false);
+
+  const [visibleDialogMeal, setVisibleDialogMeal] = useState(false);
+  const showDialogMeal = () => setVisibleDialogMeal(true);
+  const hideDialogMeal = () => setVisibleDialogMeal(false);
+
+  const [visibleDialogFoodItem, setVisibleDialogFoodItem] = useState(false);
+  const showDialogFoodItem = () => setVisibleDialogFoodItem(true);
+  const hideDialogFoodItem = () => setVisibleDialogFoodItem(false);
 
   const [mealsTotals, setMealsTotals] = useState([]);
 
@@ -46,6 +55,11 @@ const MealSummary = () => {
       navigation.navigate("Meal Home");
     },
   });
+
+  const handleDelete = () => {
+    console.log("Item Deleted");
+    hideDialogFoodItem();
+  };
 
   useEffect(() => {
     if (mealData) {
@@ -75,7 +89,7 @@ const MealSummary = () => {
           },
           headerRight: () => {
             return (
-              <TouchableOpacity onPress={() => mutate(id)}>
+              <TouchableOpacity onPress={() => showDialogMeal()}>
                 <FontAwesome
                   name="trash-o"
                   size={32}
@@ -118,6 +132,10 @@ const MealSummary = () => {
                     proteins={item.mainNutrients.proteins}
                     quantity={item.quantity}
                     unit={item.unitOfMeasurement}
+                    visible={visibleDialogFoodItem}
+                    showDialog={showDialogFoodItem}
+                    hideDialog={hideDialogFoodItem}
+                    handleDelete={handleDelete}
                   />
                 </View>
               )}
@@ -129,6 +147,7 @@ const MealSummary = () => {
               textColor={Colors.black.text}
               labelStyle={{ fontSize: 18 }}
               style={pageStyles.addFoodButton}
+              contentStyle={{ paddingVertical: 10, paddingHorizontal: 20 }}
               onPress={() => showModal()}
             >
               Add Food
@@ -136,7 +155,7 @@ const MealSummary = () => {
 
             <Portal>
               <Modal
-                visible={visible}
+                visible={visibleModal}
                 onDismiss={hideModal}
                 contentContainerStyle={pageStyles.modal}
               >
@@ -168,6 +187,55 @@ const MealSummary = () => {
                   </TouchableOpacity>
                 </View>
               </Modal>
+            </Portal>
+
+            <Portal>
+              <Dialog
+                visible={visibleDialogMeal}
+                onDismiss={hideDialogMeal}
+                style={pageStyles.dialog}
+              >
+                <Dialog.Title
+                  style={{
+                    fontSize: SIZES.lg,
+                    fontWeight: "bold",
+                    color: Colors.black.text,
+                  }}
+                >
+                  Are you sure you want to delete this meal?
+                </Dialog.Title>
+                <Dialog.Content>
+                  <Text
+                    variant="bodyLarge"
+                    style={{ color: Colors.black.text }}
+                  >
+                    This meal will be deleted permanently. You cannot undo this
+                    action.
+                  </Text>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button
+                    mode="outlined"
+                    buttonColor={Colors.lightWhite.text}
+                    textColor={Colors.black.text}
+                    style={pageStyles.dialogButton}
+                    contentStyle={{ paddingHorizontal: "6%" }}
+                    onPress={hideDialogMeal}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    mode="outlined"
+                    buttonColor={Colors.red.text}
+                    textColor={Colors.lightWhite.text}
+                    style={pageStyles.dialogButton}
+                    contentStyle={{ paddingHorizontal: "6%" }}
+                    onPress={() => mutate(id)}
+                  >
+                    Delete
+                  </Button>
+                </Dialog.Actions>
+              </Dialog>
             </Portal>
           </>
         )}
