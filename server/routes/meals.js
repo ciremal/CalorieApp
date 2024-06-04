@@ -63,10 +63,10 @@ router.post("/deleteMealFoodItem", async (req, res) => {
   meal.foodItems = meal.foodItems.filter((item) => item.toString() != foodId);
 
   const { cals, carbs, fats, proteins } = foodItem.mainNutrients;
-  meal.cals -= cals;
-  meal.carbs -= carbs;
-  meal.fats -= fats;
-  meal.proteins -= proteins;
+  meal.cals = roundNumbers(meal.cals - cals);
+  meal.carbs = roundNumbers(meal.carbs - carbs);
+  meal.fats = roundNumbers(meal.fats - fats);
+  meal.proteins = roundNumbers(meal.proteins - proteins);
 
   await meal
     .save()

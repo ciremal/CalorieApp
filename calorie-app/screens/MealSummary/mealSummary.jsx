@@ -39,10 +39,6 @@ const MealSummary = () => {
   const showDialogMeal = () => setVisibleDialogMeal(true);
   const hideDialogMeal = () => setVisibleDialogMeal(false);
 
-  const [visibleDialogFoodItem, setVisibleDialogFoodItem] = useState(false);
-  const showDialogFoodItem = () => setVisibleDialogFoodItem(true);
-  const hideDialogFoodItem = () => setVisibleDialogFoodItem(false);
-
   const [mealsTotals, setMealsTotals] = useState([]);
 
   const queryClient = useQueryClient();
@@ -64,9 +60,9 @@ const MealSummary = () => {
     },
   });
 
-  const handleDelete = (foodId) => {
+  const handleDelete = (foodId, hideDialog) => {
     deleteFoodItem({ mealId: id, foodId: foodId });
-    hideDialogFoodItem();
+    hideDialog();
   };
 
   useEffect(() => {
@@ -132,13 +128,7 @@ const MealSummary = () => {
                     alignItems: "center",
                   }}
                 >
-                  <FoodItemBox
-                    foodItem={item}
-                    visible={visibleDialogFoodItem}
-                    showDialog={showDialogFoodItem}
-                    hideDialog={hideDialogFoodItem}
-                    handleDelete={handleDelete}
-                  />
+                  <FoodItemBox foodItem={item} handleDelete={handleDelete} />
                 </View>
               )}
             />

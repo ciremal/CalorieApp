@@ -24,7 +24,6 @@ import { useCreateMeal, useGetMeals } from "../../api/meals";
 import { useMutation } from "react-query";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
 import { Feather } from "@expo/vector-icons";
-import { Button as NativeBaseButton } from "native-base";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
