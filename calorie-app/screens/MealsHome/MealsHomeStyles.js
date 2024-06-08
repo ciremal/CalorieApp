@@ -36,4 +36,11 @@ export const mealsHomeStyles = StyleSheet.create({
     backgroundColor: "white",
     borderColor: Colors.orange.text,
   },
+
+  calendarButton: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

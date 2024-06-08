@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import getDate from "../helpers/getDate.js";
 
 const mealSchema = mongoose.Schema({
   title: {
@@ -29,8 +30,8 @@ const mealSchema = mongoose.Schema({
     default: 0,
   },
   createdAt: {
-    type: Date,
-    default: new Date(),
+    type: String,
+    default: getDate(),
   },
 });
 

@@ -3,10 +3,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Button,
+  Text,
   SafeAreaView,
 } from "react-native";
 import { Stack } from "expo-router";
-import { mealsHomeStyles as pageStyles } from "./MealsHomeStyles";
+import {
+  mealsHomeStyles,
+  mealsHomeStyles as pageStyles,
+} from "./MealsHomeStyles";
 import styles from "../../styles/general";
 import MealBox from "../../components/MealBox/MealBox";
 import {
@@ -20,10 +24,12 @@ import {
 import { Colors } from "@/constants/Colors";
 import { useState } from "react";
 import Totals from "../../components/Totals/Totals";
-import { useCreateMeal, useGetMeals } from "../../api/meals";
+import { useCreateMeal, useGetMealsByDate } from "../../api/meals";
 import { useMutation } from "react-query";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Entypo } from "@expo/vector-icons";
+import { Calendar } from "react-native-calendars";
+import { dateToday, dateYesterday } from "@/helpers/dates";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
@@ -32,7 +38,20 @@ const MealsHome = () => {
 
   const [mealName, setMealName] = useState("");
 
-  const { data: meals, isFetching, error, refetch } = useGetMeals();
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  const showCalendar = () => setCalendarVisible(true);
+  const hideCalendar = () => setCalendarVisible(false);
+
+  const currentDate = dateToday;
+
+  const [selectedDate, setSelectedDate] = useState(currentDate);
+
+  const {
+    data: meals,
+    isFetching,
+    error,
+    refetch,
+  } = useGetMealsByDate(selectedDate);
   const { mutate } = useMutation({
     mutationFn: useCreateMeal,
     onSuccess: () => {
@@ -43,7 +62,12 @@ const MealsHome = () => {
   });
 
   const addMeal = async (title: string): Promise<void> => {
-    mutate(title);
+    mutate({ title: title, createdAt: selectedDate });
+  };
+
+  const handleDateSelection = (day: any) => {
+    setSelectedDate(day.dateString);
+    hideCalendar();
   };
 
   return (
@@ -51,7 +75,21 @@ const MealsHome = () => {
       <Divider style={styles.divider} />
       <Stack.Screen
         options={{
-          headerTitle: () => <Button title="Today" color={"#000000"} />,
+          headerTitle: () => (
+            <TouchableOpacity
+              onPress={() => showCalendar()}
+              style={mealsHomeStyles.calendarButton}
+            >
+              <Text style={{ fontSize: 18 }}>
+                {selectedDate === currentDate
+                  ? "Today"
+                  : selectedDate === dateYesterday
+                  ? "Yesterday"
+                  : selectedDate}
+              </Text>
+              <Entypo name="triangle-down" size={18} color="black" />
+            </TouchableOpacity>
+          ),
           headerRight: () => {
             return (
               <TouchableOpacity onPress={() => showModal()}>
@@ -68,7 +106,7 @@ const MealsHome = () => {
               message={"Could not load meals. Please try again later"}
             />
           )}
-          {isFetching && (
+          {isFetching && !meals && (
             <ActivityIndicator animating={true} color={Colors.orange.text} />
           )}
           {meals && (
@@ -77,6 +115,7 @@ const MealsHome = () => {
               {meals.map((meal: any) => (
                 <MealBox meal={meal} key={meal.title} />
               ))}
+
               <Portal>
                 <Modal
                   visible={visible}
@@ -103,6 +142,37 @@ const MealsHome = () => {
                     >
                       Add
                     </PaperButton>
+                  </View>
+                </Modal>
+              </Portal>
+
+              <Portal>
+                <Modal
+                  visible={calendarVisible}
+                  onDismiss={hideCalendar}
+                  contentContainerStyle={pageStyles.modal}
+                >
+                  <View style={pageStyles.modalContentContainer}>
+                    <Calendar
+                      onDayPress={(day) => handleDateSelection(day)}
+                      markedDates={{
+                        [currentDate]: {
+                          selected: true,
+                          marked: true,
+                          dotColor: Colors.orange.text,
+                          selectedColor: "white",
+                          selectedTextColor: Colors.black.text,
+                        },
+                        [selectedDate]: {
+                          selected: true,
+                          marked: false,
+                          selectedColor: Colors.lightOrange.text,
+                        },
+                      }}
+                      theme={{
+                        arrowColor: Colors.orange.text,
+                      }}
+                    />
                   </View>
                 </Modal>
               </Portal>

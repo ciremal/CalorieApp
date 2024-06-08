@@ -16,6 +16,17 @@ router.get("/getMeals", async (req, res) => {
     });
 });
 
+router.post("/getMealsByDate", async (req, res) => {
+  const { date } = req.body;
+  await MealModel.find({ createdAt: date })
+    .then(function (meals) {
+      res.json(meals);
+    })
+    .catch(function (err) {
+      res.json(err);
+    });
+});
+
 router.post("/getMealById", async (req, res) => {
   const { id } = req.body;
   await MealModel.findById(id)

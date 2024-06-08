@@ -29,7 +29,7 @@ const MealSummary = () => {
   const navigation = useNavigation();
 
   const { meal } = router.params;
-  const { _id: id, title } = meal;
+  const { _id: id, title, createdAt } = meal;
 
   const [visibleModal, setVisibleModal] = useState(false);
   const showModal = () => setVisibleModal(true);
@@ -47,7 +47,10 @@ const MealSummary = () => {
   const { mutate } = useMutation({
     mutationFn: useDeleteMeal,
     onSuccess: async () => {
-      await queryClient.refetchQueries("getMeals", { active: true });
+      await queryClient.refetchQueries({
+        queryKey: ["getMealsByDate", createdAt],
+        active: true,
+      });
       navigation.navigate("Meal Home");
     },
   });
@@ -56,7 +59,10 @@ const MealSummary = () => {
     mutationFn: useDeleteFoodItem,
     onSuccess: async () => {
       refetch(id);
-      await queryClient.refetchQueries("getMeals", { active: true });
+      await queryClient.refetchQueries({
+        queryKey: ["getMealsByDate", createdAt],
+        active: true,
+      });
     },
   });
 
