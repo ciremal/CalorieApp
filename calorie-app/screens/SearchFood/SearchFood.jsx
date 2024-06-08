@@ -17,6 +17,7 @@ import { useFetchFoodData } from "@/hooks/useFetchFoodData";
 import SearchSuggestion from "../../components/SearchSuggestion/SearchSuggestion";
 import { SIZES } from "@/constants/sizes";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { EmptySearchResult } from "@/components/Alerts/Alerts";
 
 const SearchFood = () => {
   const navigation = useNavigation();
@@ -96,34 +97,41 @@ const SearchFood = () => {
             <AntDesign name="search1" size={30} color="black" />
           </TouchableOpacity>
         </View>
-        <ScrollView
-          name={"search-suggestions"}
-          style={pageStyles.searchSuggestions}
-        >
-          {!isLoading && data.hints !== undefined ? (
-            <FlatList
-              data={data.hints}
-              renderItem={({ item }) => (
-                <SearchSuggestion
-                  name={item.food.label}
-                  cals={item.food.nutrients.ENERC_KCAL}
-                  brand={item.food.brand}
-                  foodId={item.food.foodId}
-                  measures={item.measures}
-                  handleSelectedItem={handleSelectedItem}
-                />
-              )}
-              keyExtractor={(item, index) => item.food.foodId + index}
-              scrollEnabled={false}
-            />
-          ) : (
-            <ActivityIndicator
-              animating={true}
-              color={Colors.lightOrange.text}
-              size={SIZES.xl3}
-            />
-          )}
-        </ScrollView>
+        {!isLoading && data.hints !== undefined ? (
+          <ScrollView
+            name={"search-suggestions"}
+            style={pageStyles.searchSuggestions}
+            scrollEnabled={data.hints.length > 0}
+          >
+            {data.hints.length > 0 ? (
+              <FlatList
+                data={data.hints}
+                renderItem={({ item }) => (
+                  <SearchSuggestion
+                    name={item.food.label}
+                    cals={item.food.nutrients.ENERC_KCAL}
+                    brand={item.food.brand}
+                    foodId={item.food.foodId}
+                    measures={item.measures}
+                    handleSelectedItem={handleSelectedItem}
+                  />
+                )}
+                keyExtractor={(item, index) => item.food.foodId + index}
+                scrollEnabled={false}
+              />
+            ) : (
+              <EmptySearchResult
+                message={`Sorry, we couldn't find any results for ${data.text}`}
+              />
+            )}
+          </ScrollView>
+        ) : (
+          <ActivityIndicator
+            animating={true}
+            color={Colors.lightOrange.text}
+            size={SIZES.xl3}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
