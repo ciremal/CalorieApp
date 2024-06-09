@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const foodItemSchema = mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: { value: true, message: "Please enter a name for the food item" },
   },
   quantity: {
     type: Number,

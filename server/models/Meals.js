@@ -4,7 +4,7 @@ import getDate from "../helpers/getDate.js";
 const mealSchema = mongoose.Schema({
   title: {
     type: String,
-    required: true,
+    required: { value: true, message: "Please enter a name for the meal" },
   },
   foodItems: [
     { type: mongoose.Schema.Types.ObjectId, ref: "FoodItem", default: [] },

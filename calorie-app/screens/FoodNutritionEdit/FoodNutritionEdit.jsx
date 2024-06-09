@@ -46,6 +46,8 @@ const FoodNutritionEdit = () => {
   const [nutrients, setNutrients] = useState([]);
   const [notes, setNotes] = useState("");
 
+  const [foodNameError, setFoodNameError] = useState("");
+
   const { data, isLoading, error } = useFetchSpecificFood(
     foodId,
     100,
@@ -100,6 +102,12 @@ const FoodNutritionEdit = () => {
   });
 
   const handleAddFood = () => {
+    if (!foodName) {
+      setFoodNameError("Please enter a name");
+      return;
+    }
+    setFoodNameError("");
+
     const mainNutrients = {
       cals: nutrients.find((item) => item.label === "Calories").quantity,
       fats: nutrients.find((item) => item.label === "Fats").quantity,
@@ -161,6 +169,7 @@ const FoodNutritionEdit = () => {
                     value={foodName}
                     onChangeText={setFoodName}
                   />
+                  {foodNameError && <Text>{foodNameError}</Text>}
                 </View>
                 <View
                   style={{ paddingHorizontal: 10 }}

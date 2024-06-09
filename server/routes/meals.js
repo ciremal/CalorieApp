@@ -40,11 +40,23 @@ router.post("/getMealById", async (req, res) => {
 });
 
 router.post("/createMeal", async (req, res) => {
-  const meal = req.body;
-  const newMeal = new MealModel(meal);
-  await newMeal.save();
+  try {
+    const meal = req.body;
+    const newMeal = new MealModel(meal);
+    await newMeal.save();
 
-  res.json(meal);
+    res.status(201).json({
+      success: true,
+      message: "Meal created successfully",
+      data: newMeal,
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: "Please enter a name for the meal",
+      error: e.message,
+    });
+  }
 });
 
 router.post("/createFoodItem", async (req, res) => {

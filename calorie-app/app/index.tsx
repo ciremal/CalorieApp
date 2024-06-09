@@ -7,9 +7,11 @@ import SearchFood from "@/screens/SearchFood/SearchFood";
 import FoodNutritionEdit from "@/screens/FoodNutritionEdit/FoodNutritionEdit";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { LogBox } from "react-native";
 
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
+LogBox.ignoreAllLogs();
 
 const Home = () => {
   return (

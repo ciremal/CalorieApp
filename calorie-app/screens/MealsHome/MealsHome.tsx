@@ -2,7 +2,6 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Button,
   Text,
   SafeAreaView,
 } from "react-native";
@@ -33,7 +32,11 @@ import { dateToday, dateYesterday } from "@/helpers/dates";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
-  const showModal = () => setVisible(true);
+  const [addMealError, setAddMealError] = useState("");
+  const showModal = () => {
+    setVisible(true);
+    setAddMealError("");
+  };
   const hideModal = () => setVisible(false);
 
   const [mealName, setMealName] = useState("");
@@ -58,6 +61,9 @@ const MealsHome = () => {
       hideModal();
       setMealName("");
       refetch();
+    },
+    onError: (error: any) => {
+      setAddMealError(error.message);
     },
   });
 
@@ -133,15 +139,39 @@ const MealsHome = () => {
                       textColor={Colors.black.text}
                       onChangeText={(text) => setMealName(text)}
                     />
-                    <PaperButton
-                      mode="contained"
-                      textColor={Colors.black.text}
-                      buttonColor={Colors.lightOrange.text}
-                      labelStyle={{ fontSize: 18 }}
-                      onPress={() => addMeal(mealName)}
+                    {addMealError && (
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          columnGap: 5,
+                        }}
+                      >
+                        <Entypo name="warning" size={18} color="red" />
+                        <Text style={{ color: Colors.red.text }}>
+                          {addMealError}
+                        </Text>
+                      </View>
+                    )}
+                    <View
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
                     >
-                      Add
-                    </PaperButton>
+                      <PaperButton
+                        mode="contained"
+                        textColor={Colors.black.text}
+                        buttonColor={Colors.lightOrange.text}
+                        labelStyle={{ fontSize: 18 }}
+                        style={{ width: "40%" }}
+                        onPress={() => addMeal(mealName)}
+                      >
+                        Add
+                      </PaperButton>
+                    </View>
                   </View>
                 </Modal>
               </Portal>

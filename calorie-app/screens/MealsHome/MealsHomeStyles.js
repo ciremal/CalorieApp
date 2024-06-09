@@ -26,8 +26,7 @@ export const mealsHomeStyles = StyleSheet.create({
   modalContentContainer: {
     width: "100%",
     display: "flex",
-    alignItems: "center",
-    rowGap: "15%",
+    rowGap: "10%",
     padding: 20,
   },
 

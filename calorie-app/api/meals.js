@@ -28,9 +28,15 @@ export const useGetMealById = (id) => {
 };
 
 export const useCreateMeal = async ({ title, createdAt }) => {
-  return axios
-    .post(`http://${backendIp}:5000/meals/createMeal`, { title, createdAt })
-    .then((res) => res.data);
+  try {
+    const res = await axios.post(`http://${backendIp}:5000/meals/createMeal`, {
+      title,
+      createdAt,
+    });
+    return res.data;
+  } catch (err) {
+    throw err.response.data;
+  }
 };
 
 export const useDeleteMeal = async (id) => {

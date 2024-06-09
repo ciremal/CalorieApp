@@ -2,7 +2,6 @@ import { View, Text } from "react-native";
 import { alertsStyles } from "./AlertsStyles.js";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import { SIZES } from "@/constants/sizes.js";
 
 export const ErrorAlert = (props: { message: String }) => {
   return (
