@@ -112,23 +112,25 @@ router.post("/createMeal", async (req, res) => {
 // });
 
 router.post("/deleteMeal", async (req, res) => {
-  const { id } = req.body;
+  try {
+    const { id } = req.body;
 
-  MealModel.findByIdAndDelete(id)
-    .then(function (meal) {
-      res.status(201).json({
-        success: true,
-        message: "Meal deleted successfully",
-        data: meal,
-      });
-    })
-    .catch(function (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error deleting Meal",
-        error: error,
-      });
+    const meal = await MealModel.findById(id);
+    await FoodItemModel.deleteMany({ _id: { $in: meal.foodItems } });
+    await MealModel.deleteOne({ _id: id });
+
+    res.status(201).json({
+      success: true,
+      message: "Meal deleted successfully",
+      data: meal,
     });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting Meal",
+      error: error,
+    });
+  }
 });
 
 router.post("/deleteMealFoodItem", async (req, res) => {
