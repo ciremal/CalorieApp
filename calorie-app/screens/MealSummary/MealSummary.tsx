@@ -1,34 +1,28 @@
 import { SafeAreaView, View, TouchableOpacity } from "react-native";
-import {
-  Divider,
-  Button,
-  Text,
-  Portal,
-  Modal,
-  ActivityIndicator,
-  Dialog,
-} from "react-native-paper";
+import { Divider, Button, ActivityIndicator } from "react-native-paper";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { mealsStyles as pageStyles } from "./MealSummaryStyles";
 import styles from "../../styles/general";
 import Totals from "../../components/Totals/Totals";
 import { useState, useEffect } from "react";
-import { SIZES } from "../../constants/sizes";
 import FoodItemBox from "../../components/FoodItemBox/FoodItemBox";
 import { FlatList } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useMutation, useQueryClient } from "react-query";
 import { useDeleteFoodItem, useDeleteMeal, useGetMealById } from "@/api/meals";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
+import DeleteDialog from "@/components/DeleteDialog/DeleteDialog";
+import CreateFoodItemModal from "@/components/Modals/CreateFoodItemModal";
 
 const MealSummary = () => {
   const router = useRoute();
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
 
-  const { meal } = router.params;
+  const { meal }: any = router.params;
   const { _id: id, title, createdAt } = meal;
 
   const [visibleModal, setVisibleModal] = useState(false);
@@ -41,10 +35,9 @@ const MealSummary = () => {
 
   const [mealsTotals, setMealsTotals] = useState([]);
 
-  const queryClient = useQueryClient();
   const { data: mealData, isFetching, error, refetch } = useGetMealById(id);
 
-  const { mutate } = useMutation({
+  const { mutate: deleteMealItem } = useMutation({
     mutationFn: useDeleteMeal,
     onSuccess: async () => {
       await queryClient.refetchQueries({
@@ -66,14 +59,18 @@ const MealSummary = () => {
     },
   });
 
-  const handleDelete = (foodId, hideDialog) => {
+  const handleDeleteMeal = (mealId: string) => {
+    deleteMealItem(mealId);
+  };
+
+  const handleDeleteFoodItem = (foodId: string, hideDialog: () => void) => {
     deleteFoodItem({ mealId: id, foodId: foodId });
     hideDialog();
   };
 
   useEffect(() => {
     if (mealData) {
-      const result = mealData.foodItems.map((item) => item.mainNutrients);
+      const result = mealData.foodItems.map((item: any) => item.mainNutrients);
       setMealsTotals(result);
     }
   }, [mealData]);
@@ -134,7 +131,10 @@ const MealSummary = () => {
                     alignItems: "center",
                   }}
                 >
-                  <FoodItemBox foodItem={item} handleDelete={handleDelete} />
+                  <FoodItemBox
+                    foodItem={item}
+                    handleDelete={handleDeleteFoodItem}
+                  />
                 </View>
               )}
             />
@@ -151,90 +151,21 @@ const MealSummary = () => {
               Add Food
             </Button>
 
-            <Portal>
-              <Modal
-                visible={visibleModal}
-                onDismiss={hideModal}
-                contentContainerStyle={pageStyles.modal}
-              >
-                <View style={pageStyles.modalContentContainer}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("Search Food", { meal: meal });
-                      hideModal();
-                    }}
-                  >
-                    <View
-                      style={[pageStyles.addFoodOption, styles.raisedStyle]}
-                    >
-                      <AntDesign
-                        name="search1"
-                        size={SIZES.xl3}
-                        color="black"
-                      />
-                      <Text style={pageStyles.addFoodOptionText}>Search</Text>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <View
-                      style={[pageStyles.addFoodOption, styles.raisedStyle]}
-                    >
-                      <Entypo name="pencil" size={SIZES.xl3} color="black" />
-                      <Text style={pageStyles.addFoodOptionText}>Manual</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </Modal>
-            </Portal>
+            <CreateFoodItemModal
+              visible={visibleModal}
+              hideModal={hideModal}
+              navigation={navigation}
+              meal={meal}
+            />
 
-            <Portal>
-              <Dialog
-                visible={visibleDialogMeal}
-                onDismiss={hideDialogMeal}
-                style={pageStyles.dialog}
-              >
-                <Dialog.Title
-                  style={{
-                    fontSize: SIZES.lg,
-                    fontWeight: "bold",
-                    color: Colors.black.text,
-                  }}
-                >
-                  Are you sure you want to delete this meal?
-                </Dialog.Title>
-                <Dialog.Content>
-                  <Text
-                    variant="bodyLarge"
-                    style={{ color: Colors.black.text }}
-                  >
-                    This meal will be deleted permanently. You cannot undo this
-                    action.
-                  </Text>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button
-                    mode="outlined"
-                    buttonColor={Colors.lightWhite.text}
-                    textColor={Colors.black.text}
-                    style={pageStyles.dialogButton}
-                    contentStyle={{ paddingHorizontal: "6%" }}
-                    onPress={hideDialogMeal}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    mode="outlined"
-                    buttonColor={Colors.red.text}
-                    textColor={Colors.lightWhite.text}
-                    style={pageStyles.dialogButton}
-                    contentStyle={{ paddingHorizontal: "6%" }}
-                    onPress={() => mutate(id)}
-                  >
-                    Delete
-                  </Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
+            <DeleteDialog
+              visible={visibleDialogMeal}
+              hideDialog={hideDialogMeal}
+              onSubmit={handleDeleteMeal}
+              id={id}
+              title="Are you sure you want to delete this meal?"
+              warning="This meal will be deleted permanently. You cannot undo this action."
+            />
           </>
         )}
       </View>

@@ -5,6 +5,7 @@ import {
   View,
   TextInput,
   FlatList,
+  Text,
 } from "react-native";
 import { ActivityIndicator, Divider } from "react-native-paper";
 import { Stack } from "expo-router";
@@ -22,11 +23,14 @@ import { EmptySearchResult } from "@/components/Alerts/Alerts";
 const SearchFood = () => {
   const navigation = useNavigation();
   const router = useRoute();
-  const { meal } = router.params;
-  const [searchedFood, setSearchedFood] = useState("");
-  const [textInputWidth, setTextInputWidth] = useState(0);
-  const { data, isLoading, setQuery } = useFetchFoodData();
 
+  const { meal } = router.params;
+
+  const [searchedFood, setSearchedFood] = useState("");
+  const [lastSearched, setLastSearched] = useState();
+  const [textInputWidth, setTextInputWidth] = useState(0);
+
+  const { data, isLoading, setQuery, error } = useFetchFoodData();
   const handleSelectedItem = (foodId, measureId, foodName, measures) => {
     const measureOptions = measures
       .map((item) => {
@@ -91,18 +95,40 @@ const SearchFood = () => {
             ]}
             onPress={() => {
               setQuery(searchedFood);
+              setLastSearched(searchedFood);
               setSearchedFood("");
             }}
           >
             <AntDesign name="search1" size={30} color="black" />
           </TouchableOpacity>
         </View>
-        {!isLoading && data.hints !== undefined ? (
+        {error && (
+          <ErrorAlert
+            message={"Could not load meals. Please try again later"}
+          />
+        )}
+        {(isLoading || !data.hints) && (
+          <ActivityIndicator
+            animating={true}
+            color={Colors.lightOrange.text}
+            size={SIZES.xl3}
+            style={{ marginTop: 25 }}
+          />
+        )}
+        {!isLoading && data.hints !== undefined && (
           <ScrollView
             name={"search-suggestions"}
             style={pageStyles.searchSuggestions}
             scrollEnabled={data.hints.length > 0}
           >
+            {lastSearched && (
+              <Text
+                style={{ marginLeft: 10, marginBottom: 3, fontSize: SIZES.md }}
+              >
+                Search results for{" "}
+                <Text style={{ fontStyle: "italic" }}>{lastSearched}</Text>
+              </Text>
+            )}
             {data.hints.length > 0 ? (
               <FlatList
                 data={data.hints}
@@ -125,12 +151,6 @@ const SearchFood = () => {
               />
             )}
           </ScrollView>
-        ) : (
-          <ActivityIndicator
-            animating={true}
-            color={Colors.lightOrange.text}
-            size={SIZES.xl3}
-          />
         )}
       </View>
     </SafeAreaView>

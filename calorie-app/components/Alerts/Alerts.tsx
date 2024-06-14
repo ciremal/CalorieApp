@@ -1,6 +1,10 @@
 import { View, Text } from "react-native";
 import { alertsStyles } from "./AlertsStyles.js";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Entypo,
+  MaterialCommunityIcons,
+  FontAwesome6,
+} from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 
 export const ErrorAlert = (props: { message: String }) => {
@@ -20,6 +24,15 @@ export const EmptySearchResult = (props: { message: String }) => {
         size={125}
         color={Colors.orange.text}
       />
+      <Text style={alertsStyles.emptySearchMessage}>{props.message}</Text>
+    </View>
+  );
+};
+
+export const SomethingWentWrong = (props: { message: String }) => {
+  return (
+    <View style={alertsStyles.emptySearchContainer}>
+      <FontAwesome6 name="sad-tear" size={125} color="black" />
       <Text style={alertsStyles.emptySearchMessage}>{props.message}</Text>
     </View>
   );

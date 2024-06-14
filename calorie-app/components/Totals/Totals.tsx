@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import totalsStyles from "./totalsStyles";
 import roundNumbers from "../../helpers/roundNumbers";
 
-const Totals = ({ meals }) => {
+const Totals = ({ meals }: { meals: any }) => {
   const [totals, setTotals] = useState({
     fats: 0,
     carbs: 0,
@@ -17,7 +17,7 @@ const Totals = ({ meals }) => {
 
   return (
     <View style={totalsStyles.container}>
-      <View style={totalsStyles.totalContainer}>
+      <View>
         <Text style={totalsStyles.textStyles}>Fats</Text>
         <Text style={totalsStyles.textStyles}>{totals.fats}</Text>
       </View>
@@ -37,10 +37,10 @@ const Totals = ({ meals }) => {
   );
 };
 
-const calcTotals = (meals) => {
+const calcTotals = (meals: any) => {
   const result = { fats: 0, carbs: 0, proteins: 0, cals: 0 };
 
-  meals.map((meal) => {
+  meals.map((meal: any) => {
     result.fats = roundNumbers(result.fats + meal.fats);
     result.carbs = roundNumbers(result.carbs + meal.carbs);
     result.proteins = roundNumbers(result.proteins + meal.proteins);

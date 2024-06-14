@@ -42,12 +42,4 @@ export const foodItemBoxStyles = StyleSheet.create({
     flexDirection: "row",
     maxWidth: "80%",
   },
-  dialog: {
-    backgroundColor: Colors.lightWhite.text,
-  },
-
-  dialogButton: {
-    borderColor: Colors.black.text,
-    borderRadius: 5,
-  },
 });

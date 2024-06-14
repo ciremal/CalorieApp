@@ -12,14 +12,7 @@ import {
 } from "./MealsHomeStyles";
 import styles from "../../styles/general";
 import MealBox from "../../components/MealBox/MealBox";
-import {
-  Button as PaperButton,
-  Modal,
-  Portal,
-  TextInput,
-  Divider,
-  ActivityIndicator,
-} from "react-native-paper";
+import { Divider, ActivityIndicator } from "react-native-paper";
 import { Colors } from "@/constants/Colors";
 import { useState } from "react";
 import Totals from "../../components/Totals/Totals";
@@ -27,10 +20,9 @@ import { useCreateMeal, useGetMealsByDate } from "../../api/meals";
 import { useMutation } from "react-query";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
 import { Feather, Entypo } from "@expo/vector-icons";
-import { Calendar } from "react-native-calendars";
 import { dateToday, dateYesterday } from "@/helpers/dates";
-import { Formik } from "formik";
-import { Dropdown } from "react-native-element-dropdown";
+import CalendarModal from "@/components/Modals/CalendarModal";
+import CreateMealModal from "@/components/Modals/CreateMealModal";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
@@ -42,7 +34,6 @@ const MealsHome = () => {
   const hideCalendar = () => setCalendarVisible(false);
 
   const currentDate = dateToday;
-
   const [selectedDate, setSelectedDate] = useState(currentDate);
 
   const {
@@ -51,6 +42,7 @@ const MealsHome = () => {
     error,
     refetch,
   } = useGetMealsByDate(selectedDate);
+
   const { mutate } = useMutation({
     mutationFn: useCreateMeal,
     onSuccess: () => {
@@ -117,111 +109,19 @@ const MealsHome = () => {
                 <MealBox meal={meal} key={meal.title} />
               ))}
 
-              <Portal>
-                <Modal
-                  visible={visible}
-                  onDismiss={hideModal}
-                  contentContainerStyle={pageStyles.modal}
-                >
-                  <View style={pageStyles.modalContentContainer}>
-                    <Formik
-                      initialValues={{ mealName: "" }}
-                      validate={(values) => {
-                        const errors = {};
-                        if (!values.mealName) {
-                          errors.mealName = "Meal name is required";
-                        } else if (values.mealName.length > 25) {
-                          errors.mealName =
-                            "Meal name should be between 1 and 25 characters";
-                        }
-                        return errors;
-                      }}
-                      onSubmit={(values) => addMeal(values.mealName)}
-                    >
-                      {({
-                        handleChange,
-                        handleBlur,
-                        handleSubmit,
-                        values,
-                        errors,
-                      }) => (
-                        <View>
-                          <TextInput
-                            label={"Meal Name"}
-                            onChangeText={handleChange("mealName")}
-                            onBlur={handleBlur("mealName")}
-                            value={values.mealName}
-                            mode="outlined"
-                            style={pageStyles.textInput}
-                            outlineColor={Colors.orange.text}
-                            activeOutlineColor={Colors.lightOrange.text}
-                            textColor={Colors.black.text}
-                          />
-                          {errors.mealName && (
-                            <Text
-                              style={{
-                                marginBottom: 10,
-                                color: Colors.red.text,
-                              }}
-                            >
-                              {errors.mealName}
-                            </Text>
-                          )}
-                          <View
-                            style={{
-                              width: "100%",
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            <PaperButton
-                              mode="contained"
-                              textColor={Colors.black.text}
-                              buttonColor={Colors.lightOrange.text}
-                              labelStyle={{ fontSize: 18 }}
-                              style={{ width: "40%", marginTop: 10 }}
-                              onPress={() => handleSubmit()}
-                            >
-                              Add
-                            </PaperButton>
-                          </View>
-                        </View>
-                      )}
-                    </Formik>
-                  </View>
-                </Modal>
-              </Portal>
+              <CreateMealModal
+                visible={visible}
+                hideModal={hideModal}
+                onSubmit={addMeal}
+              />
 
-              <Portal>
-                <Modal
-                  visible={calendarVisible}
-                  onDismiss={hideCalendar}
-                  contentContainerStyle={pageStyles.modal}
-                >
-                  <View style={pageStyles.modalContentContainer}>
-                    <Calendar
-                      onDayPress={(day) => handleDateSelection(day)}
-                      markedDates={{
-                        [currentDate]: {
-                          selected: true,
-                          marked: true,
-                          dotColor: Colors.orange.text,
-                          selectedColor: "white",
-                          selectedTextColor: Colors.black.text,
-                        },
-                        [selectedDate]: {
-                          selected: true,
-                          marked: false,
-                          selectedColor: Colors.lightOrange.text,
-                        },
-                      }}
-                      theme={{
-                        arrowColor: Colors.orange.text,
-                      }}
-                    />
-                  </View>
-                </Modal>
-              </Portal>
+              <CalendarModal
+                calendarVisible={calendarVisible}
+                hideCalendar={hideCalendar}
+                handleDateSelection={handleDateSelection}
+                currentDate={currentDate}
+                selectedDate={selectedDate}
+              />
             </>
           )}
         </View>

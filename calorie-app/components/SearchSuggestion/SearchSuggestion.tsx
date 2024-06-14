@@ -6,6 +6,20 @@ import { Colors } from "@/constants/Colors";
 import { SIZES } from "../../constants/sizes";
 import roundNumbers from "../../helpers/roundNumbers";
 
+type SearchSuggestionProps = {
+  name: string;
+  cals: number;
+  brand: string;
+  foodId: string;
+  measures: any;
+  handleSelectedItem: (
+    foodId: string,
+    measureId: string,
+    foodName: string,
+    measures: any
+  ) => void;
+};
+
 const SearchSuggestion = ({
   name,
   cals,
@@ -13,8 +27,8 @@ const SearchSuggestion = ({
   foodId,
   measures,
   handleSelectedItem,
-}) => {
-  const measureId = measures.find((item) => item.label === "Gram").uri;
+}: SearchSuggestionProps) => {
+  const measureId = measures.find((item: any) => item.label === "Gram").uri;
 
   return (
     <View style={pageStyles.container}>

@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { SIZES } from "../../constants/sizes";
 import { useNavigation } from "@react-navigation/native";
 
-const MealBox = ({ meal }) => {
+const MealBox = ({ meal }: { meal: any }) => {
   const navigation = useNavigation();
 
   const { cals, carbs, proteins, fats, title } = meal;
