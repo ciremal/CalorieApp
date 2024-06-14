@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
+  Button,
 } from "react-native";
 import {
   Divider,
@@ -19,9 +20,9 @@ import { foodNutritionEditStyles as pageStyles } from "./FoodNutritionEditStyles
 import { Colors } from "@/constants/Colors";
 import { SIZES } from "../../constants/sizes";
 import { apiDefaults } from "../../constants/api";
-import { Ionicons, AntDesign } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import SelectDropdown from "react-native-select-dropdown";
+import { Dropdown } from "react-native-element-dropdown";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { extractNutrientsFromApi } from "../../helpers/nutrientsHelpers";
 import roundNumbers from "../../helpers/roundNumbers";
@@ -63,15 +64,15 @@ const FoodNutritionEdit = () => {
     }
   }, [data, isLoading]);
 
-  const defaultNutrients =
-    !isLoading && data.totalNutrients && data.ingredients
-      ? extractNutrientsFromApi(data.totalNutrients)
-      : [];
-
   useEffect(() => {
     const updatedMeasures = JSON.parse(measureOptions);
     setMeasures(updatedMeasures);
   }, [measureOptions]);
+
+  const defaultNutrients =
+    !isLoading && data.totalNutrients && data.ingredients
+      ? extractNutrientsFromApi(data.totalNutrients)
+      : [];
 
   useEffect(() => {
     if (defaultNutrients) {
@@ -101,7 +102,7 @@ const FoodNutritionEdit = () => {
     },
   });
 
-  const handleAddFood = (foodName, quantity, notes) => {
+  const handleAddFood = (foodName, quantity, unitOfMeasurement, notes) => {
     const mainNutrients = {
       cals: nutrients.find((item) => item.label === "Calories").quantity,
       fats: nutrients.find((item) => item.label === "Fats").quantity,
@@ -175,7 +176,7 @@ const FoodNutritionEdit = () => {
                 }}
                 onSubmit={(values) => {
                   const { foodName, quantity, notes } = values;
-                  handleAddFood(foodName, quantity, notes);
+                  handleAddFood(foodName, quantity, unitOfMeasurement, notes);
                 }}
               >
                 {({
@@ -217,11 +218,10 @@ const FoodNutritionEdit = () => {
                         Quantity
                       </Text>
                       <TextInput
-                        inputMode="numeric"
+                        inputMode="decimal"
                         style={pageStyles.textInput}
                         value={values.quantity.toString()}
                         onChangeText={(e) => {
-                          console.log(e);
                           setFieldValue("quantity", e);
                           setQuantity(e);
                         }}
@@ -238,41 +238,35 @@ const FoodNutritionEdit = () => {
                         </Text>
                       )}
                     </View>
-                    {/* <View
+                    <View
                       style={{ paddingHorizontal: 10 }}
                       id="unit-of-measurement-dropdown"
                     >
                       <Text style={{ fontSize: 18, marginLeft: 5 }}>
                         Unit of Measurement
                       </Text>
-                      <SelectDropdown
-                        data={measures.map((item) => item.label)}
-                        onSelect={(selectedItem) =>
-                          setUnitOfMeasurement(selectedItem)
-                        }
-                        defaultButtonText="Gram"
-                        buttonTextAfterSelection={(selectedItem) => {
-                          return selectedItem;
-                        }}
-                        rowTextForSelection={(item) => {
-                          return item;
-                        }}
-                        renderDropdownIcon={() => {
-                          return (
-                            <AntDesign
-                              name="caretdown"
-                              size={24}
-                              color="black"
-                            />
-                          );
-                        }}
-                        buttonStyle={pageStyles.textInput}
-                        buttonTextStyle={{
+                      <Dropdown
+                        data={measures}
+                        labelField={"label"}
+                        valueField={"label"}
+                        style={pageStyles.textInput}
+                        placeholderStyle={{
                           color: Colors.lightOrange.text,
                           textAlign: "left",
+                          fontSize: SIZES.lg,
                         }}
+                        selectedTextStyle={{
+                          color: Colors.lightOrange.text,
+                          textAlign: "left",
+                          fontSize: SIZES.lg,
+                        }}
+                        onChange={(item) => {
+                          setUnitOfMeasurement(item.label);
+                        }}
+                        search={false}
+                        placeholder={unitOfMeasurement}
                       />
-                    </View> */}
+                    </View>
                     <View id="food-nutrition-flatlist-container">
                       <FlatList
                         scrollEnabled={false}

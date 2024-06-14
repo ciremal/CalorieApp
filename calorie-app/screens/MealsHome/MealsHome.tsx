@@ -30,6 +30,7 @@ import { Feather, Entypo } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
 import { dateToday, dateYesterday } from "@/helpers/dates";
 import { Formik } from "formik";
+import { Dropdown } from "react-native-element-dropdown";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
