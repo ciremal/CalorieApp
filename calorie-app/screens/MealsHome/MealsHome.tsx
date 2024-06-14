@@ -29,17 +29,12 @@ import { ErrorAlert } from "@/components/Alerts/Alerts";
 import { Feather, Entypo } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
 import { dateToday, dateYesterday } from "@/helpers/dates";
+import { Formik } from "formik";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
-  const [addMealError, setAddMealError] = useState("");
-  const showModal = () => {
-    setVisible(true);
-    setAddMealError("");
-  };
+  const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-
-  const [mealName, setMealName] = useState("");
 
   const [calendarVisible, setCalendarVisible] = useState(false);
   const showCalendar = () => setCalendarVisible(true);
@@ -59,11 +54,10 @@ const MealsHome = () => {
     mutationFn: useCreateMeal,
     onSuccess: () => {
       hideModal();
-      setMealName("");
       refetch();
     },
     onError: (error: any) => {
-      setAddMealError(error.message);
+      console.error(error.message);
     },
   });
 
@@ -129,49 +123,70 @@ const MealsHome = () => {
                   contentContainerStyle={pageStyles.modal}
                 >
                   <View style={pageStyles.modalContentContainer}>
-                    <TextInput
-                      label={"Meal Name"}
-                      value={mealName}
-                      mode="outlined"
-                      style={pageStyles.textInput}
-                      outlineColor={Colors.orange.text}
-                      activeOutlineColor={Colors.lightOrange.text}
-                      textColor={Colors.black.text}
-                      onChangeText={(text) => setMealName(text)}
-                    />
-                    {addMealError && (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          columnGap: 5,
-                        }}
-                      >
-                        <Entypo name="warning" size={18} color="red" />
-                        <Text style={{ color: Colors.red.text }}>
-                          {addMealError}
-                        </Text>
-                      </View>
-                    )}
-                    <View
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "center",
+                    <Formik
+                      initialValues={{ mealName: "" }}
+                      validate={(values) => {
+                        const errors = {};
+                        if (!values.mealName) {
+                          errors.mealName = "Meal name is required";
+                        } else if (values.mealName.length > 25) {
+                          errors.mealName =
+                            "Meal name should be between 1 and 25 characters";
+                        }
+                        return errors;
                       }}
+                      onSubmit={(values) => addMeal(values.mealName)}
                     >
-                      <PaperButton
-                        mode="contained"
-                        textColor={Colors.black.text}
-                        buttonColor={Colors.lightOrange.text}
-                        labelStyle={{ fontSize: 18 }}
-                        style={{ width: "40%" }}
-                        onPress={() => addMeal(mealName)}
-                      >
-                        Add
-                      </PaperButton>
-                    </View>
+                      {({
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        values,
+                        errors,
+                      }) => (
+                        <View>
+                          <TextInput
+                            label={"Meal Name"}
+                            onChangeText={handleChange("mealName")}
+                            onBlur={handleBlur("mealName")}
+                            value={values.mealName}
+                            mode="outlined"
+                            style={pageStyles.textInput}
+                            outlineColor={Colors.orange.text}
+                            activeOutlineColor={Colors.lightOrange.text}
+                            textColor={Colors.black.text}
+                          />
+                          {errors.mealName && (
+                            <Text
+                              style={{
+                                marginBottom: 10,
+                                color: Colors.red.text,
+                              }}
+                            >
+                              {errors.mealName}
+                            </Text>
+                          )}
+                          <View
+                            style={{
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <PaperButton
+                              mode="contained"
+                              textColor={Colors.black.text}
+                              buttonColor={Colors.lightOrange.text}
+                              labelStyle={{ fontSize: 18 }}
+                              style={{ width: "40%", marginTop: 10 }}
+                              onPress={() => handleSubmit()}
+                            >
+                              Add
+                            </PaperButton>
+                          </View>
+                        </View>
+                      )}
+                    </Formik>
                   </View>
                 </Modal>
               </Portal>

@@ -28,6 +28,7 @@ import roundNumbers from "../../helpers/roundNumbers";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUpdateMealAddFoodItem } from "@/api/meals";
 import { useMutation, useQueryClient } from "react-query";
+import { Formik } from "formik";
 
 const FoodNutritionEdit = () => {
   const navigation = useNavigation();
@@ -40,22 +41,17 @@ const FoodNutritionEdit = () => {
     foodName: name,
     measureOptions,
   } = router.params;
-  const [foodName, setFoodName] = useState(name);
   const [quantity, setQuantity] = useState(apiDefaults.quantity);
   const [unitOfMeasurement, setUnitOfMeasurement] = useState("Gram");
   const [nutrients, setNutrients] = useState([]);
-  const [notes, setNotes] = useState("");
 
-  const [foodNameError, setFoodNameError] = useState("");
+  const [measures, setMeasures] = useState(JSON.parse(measureOptions));
 
   const { data, isLoading, error } = useFetchSpecificFood(
     foodId,
     100,
     measureId
   );
-
-  const [defaultNutrients, setDefaultNutrients] = useState();
-  const [measures, setMeasures] = useState(JSON.parse(measureOptions));
 
   useEffect(() => {
     if (
@@ -64,9 +60,13 @@ const FoodNutritionEdit = () => {
       data.ingredients !== undefined
     ) {
       setNutrients(extractNutrientsFromApi(data.totalNutrients));
-      setDefaultNutrients(extractNutrientsFromApi(data.totalNutrients));
     }
   }, [data, isLoading]);
+
+  const defaultNutrients =
+    !isLoading && data.totalNutrients && data.ingredients
+      ? extractNutrientsFromApi(data.totalNutrients)
+      : [];
 
   useEffect(() => {
     const updatedMeasures = JSON.parse(measureOptions);
@@ -101,13 +101,7 @@ const FoodNutritionEdit = () => {
     },
   });
 
-  const handleAddFood = () => {
-    if (!foodName) {
-      setFoodNameError("Please enter a name");
-      return;
-    }
-    setFoodNameError("");
-
+  const handleAddFood = (foodName, quantity, notes) => {
     const mainNutrients = {
       cals: nutrients.find((item) => item.label === "Calories").quantity,
       fats: nutrients.find((item) => item.label === "Fats").quantity,
@@ -158,103 +152,170 @@ const FoodNutritionEdit = () => {
                 size={SIZES.xl3}
               />
             ) : (
-              <View
-                style={{ width: "95%", rowGap: 12 }}
-                id="food-item-name-input"
+              <Formik
+                initialValues={{
+                  foodName: name,
+                  quantity: quantity,
+                  notes: "",
+                }}
+                validate={(values) => {
+                  const errors = {};
+                  if (!values.foodName) {
+                    errors.foodName = "Food name is required";
+                  } else if (values.foodName.length > 25) {
+                    errors.foodName =
+                      "Food name should be between 1 and 25 characters";
+                  }
+                  if (!values.quantity) {
+                    errors.quantity = "Quantity is required";
+                  } else if (values.quantity > 9999) {
+                    errors.quantity = "Quantity must be between 0 and 9999";
+                  }
+                  return errors;
+                }}
+                onSubmit={(values) => {
+                  const { foodName, quantity, notes } = values;
+                  handleAddFood(foodName, quantity, notes);
+                }}
               >
-                <View style={{ paddingHorizontal: 10 }}>
-                  <Text style={{ fontSize: 18, marginLeft: 5 }}>Name</Text>
-                  <TextInput
-                    style={pageStyles.textInput}
-                    value={foodName}
-                    onChangeText={setFoodName}
-                  />
-                  {foodNameError && <Text>{foodNameError}</Text>}
-                </View>
-                <View
-                  style={{ paddingHorizontal: 10 }}
-                  id="food-item-quantity-input"
-                >
-                  <Text style={{ fontSize: 18, marginLeft: 5 }}>Quantity</Text>
-                  <TextInput
-                    inputMode="numeric"
-                    style={pageStyles.textInput}
-                    defaultValue={quantity.toString()}
-                    value={quantity.toString()}
-                    onChangeText={setQuantity}
-                  />
-                </View>
-                <View
-                  style={{ paddingHorizontal: 10 }}
-                  id="unit-of-measurement-dropdown"
-                >
-                  <Text style={{ fontSize: 18, marginLeft: 5 }}>
-                    Unit of Measurement
-                  </Text>
-                  <SelectDropdown
-                    data={measures.map((item) => item.label)}
-                    onSelect={(selectedItem) =>
-                      setUnitOfMeasurement(selectedItem)
-                    }
-                    defaultButtonText="Gram"
-                    buttonTextAfterSelection={(selectedItem) => {
-                      return selectedItem;
-                    }}
-                    rowTextForSelection={(item) => {
-                      return item;
-                    }}
-                    renderDropdownIcon={() => {
-                      return (
-                        <AntDesign name="caretdown" size={24} color="black" />
-                      );
-                    }}
-                    buttonStyle={pageStyles.textInput}
-                    buttonTextStyle={{
-                      color: Colors.lightOrange.text,
-                      textAlign: "left",
-                    }}
-                  />
-                </View>
-                <View id="food-nutrition-flatlist-container">
-                  <FlatList
-                    scrollEnabled={false}
-                    data={nutrients}
-                    numColumns={2}
-                    columnWrapperStyle={{ justifyContent: "center" }}
-                    renderItem={({ item }) => (
-                      <View style={pageStyles.grid}>
-                        <Text>{item.label}</Text>
-                        <Text>
-                          {item.quantity}
-                          {item.unit}
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                  setFieldValue,
+                }) => (
+                  <View
+                    style={{ width: "95%", rowGap: 12 }}
+                    id="food-item-name-input"
+                  >
+                    <View style={{ paddingHorizontal: 10 }}>
+                      <Text style={{ fontSize: 18, marginLeft: 5 }}>Name</Text>
+                      <TextInput
+                        style={pageStyles.textInput}
+                        value={values.foodName}
+                        onChangeText={handleChange("foodName")}
+                        onBlur={handleBlur("foodName")}
+                      />
+                      {errors.foodName && (
+                        <Text
+                          style={{
+                            marginBottom: 10,
+                            color: Colors.red.text,
+                          }}
+                        >
+                          {errors.foodName}
                         </Text>
-                      </View>
-                    )}
-                    keyExtractor={(item) => item.label}
-                  />
-                </View>
-                <View style={{ paddingHorizontal: 10 }}>
-                  <Text style={{ fontSize: 18 }}>Notes</Text>
-                  <TextInput
-                    multiline={true}
-                    style={[
-                      pageStyles.textInput,
-                      { minHeight: 100, color: Colors.black.text },
-                    ]}
-                    value={notes}
-                    onChangeText={setNotes}
-                  />
-                </View>
-                <PaperButton
-                  mode="contained"
-                  textColor={Colors.black.text}
-                  buttonColor={Colors.lightOrange.text}
-                  labelStyle={{ fontSize: 18 }}
-                  onPress={() => handleAddFood()}
-                >
-                  Add to {meal.title}
-                </PaperButton>
-              </View>
+                      )}
+                    </View>
+                    <View
+                      style={{ paddingHorizontal: 10 }}
+                      id="food-item-quantity-input"
+                    >
+                      <Text style={{ fontSize: 18, marginLeft: 5 }}>
+                        Quantity
+                      </Text>
+                      <TextInput
+                        inputMode="numeric"
+                        style={pageStyles.textInput}
+                        value={values.quantity.toString()}
+                        onChangeText={(e) => {
+                          console.log(e);
+                          setFieldValue("quantity", e);
+                          setQuantity(e);
+                        }}
+                        onBlur={handleBlur("quantity")}
+                      />
+                      {errors.quantity && (
+                        <Text
+                          style={{
+                            marginBottom: 10,
+                            color: Colors.red.text,
+                          }}
+                        >
+                          {errors.quantity}
+                        </Text>
+                      )}
+                    </View>
+                    {/* <View
+                      style={{ paddingHorizontal: 10 }}
+                      id="unit-of-measurement-dropdown"
+                    >
+                      <Text style={{ fontSize: 18, marginLeft: 5 }}>
+                        Unit of Measurement
+                      </Text>
+                      <SelectDropdown
+                        data={measures.map((item) => item.label)}
+                        onSelect={(selectedItem) =>
+                          setUnitOfMeasurement(selectedItem)
+                        }
+                        defaultButtonText="Gram"
+                        buttonTextAfterSelection={(selectedItem) => {
+                          return selectedItem;
+                        }}
+                        rowTextForSelection={(item) => {
+                          return item;
+                        }}
+                        renderDropdownIcon={() => {
+                          return (
+                            <AntDesign
+                              name="caretdown"
+                              size={24}
+                              color="black"
+                            />
+                          );
+                        }}
+                        buttonStyle={pageStyles.textInput}
+                        buttonTextStyle={{
+                          color: Colors.lightOrange.text,
+                          textAlign: "left",
+                        }}
+                      />
+                    </View> */}
+                    <View id="food-nutrition-flatlist-container">
+                      <FlatList
+                        scrollEnabled={false}
+                        data={nutrients}
+                        numColumns={2}
+                        columnWrapperStyle={{ justifyContent: "center" }}
+                        renderItem={({ item }) => (
+                          <View style={pageStyles.grid}>
+                            <Text>{item.label}</Text>
+                            <Text>
+                              {item.quantity}
+                              {item.unit}
+                            </Text>
+                          </View>
+                        )}
+                        keyExtractor={(item) => item.label}
+                      />
+                    </View>
+                    <View style={{ paddingHorizontal: 10 }}>
+                      <Text style={{ fontSize: 18 }}>Notes</Text>
+                      <TextInput
+                        multiline={true}
+                        style={[
+                          pageStyles.textInput,
+                          { minHeight: 100, color: Colors.black.text },
+                        ]}
+                        value={values.notes}
+                        onChangeText={handleChange("notes")}
+                        onBlur={handleBlur("notes")}
+                      />
+                    </View>
+                    <PaperButton
+                      mode="contained"
+                      textColor={Colors.black.text}
+                      buttonColor={Colors.lightOrange.text}
+                      labelStyle={{ fontSize: 18 }}
+                      onPress={() => handleSubmit()}
+                    >
+                      Add to {meal.title}
+                    </PaperButton>
+                  </View>
+                )}
+              </Formik>
             )}
           </View>
         </KeyboardAwareScrollView>
