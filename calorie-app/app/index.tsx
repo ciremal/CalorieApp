@@ -5,9 +5,10 @@ import MealsHome from "@/screens/MealsHome/MealsHome";
 import MealSummary from "@/screens/MealSummary/MealSummary";
 import SearchFood from "@/screens/SearchFood/SearchFood";
 import FoodNutritionEdit from "@/screens/FoodNutritionEdit/FoodNutritionEdit";
-import React from "react";
+import React, { createContext } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { LogBox } from "react-native";
+import { MealContextProvider } from "@/hooks/useMealContext";
 
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
@@ -15,18 +16,20 @@ LogBox.ignoreAllLogs();
 
 const Home = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <NavigationContainer independent={true}>
-        <PaperProvider>
-          <Stack.Navigator initialRouteName="Meal Home">
-            <Stack.Screen name="Meal Home" component={MealsHome} />
-            <Stack.Screen name="Meal Summary" component={MealSummary} />
-            <Stack.Screen name="Search Food" component={SearchFood} />
-            <Stack.Screen name="Food Edit" component={FoodNutritionEdit} />
-          </Stack.Navigator>
-        </PaperProvider>
-      </NavigationContainer>
-    </QueryClientProvider>
+    <MealContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <NavigationContainer independent={true}>
+          <PaperProvider>
+            <Stack.Navigator initialRouteName="Meal Home">
+              <Stack.Screen name="Meal Home" component={MealsHome} />
+              <Stack.Screen name="Meal Summary" component={MealSummary} />
+              <Stack.Screen name="Search Food" component={SearchFood} />
+              <Stack.Screen name="Food Edit" component={FoodNutritionEdit} />
+            </Stack.Navigator>
+          </PaperProvider>
+        </NavigationContainer>
+      </QueryClientProvider>
+    </MealContextProvider>
   );
 };
 

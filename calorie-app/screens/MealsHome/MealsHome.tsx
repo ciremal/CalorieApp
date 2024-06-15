@@ -14,7 +14,7 @@ import styles from "../../styles/general";
 import MealBox from "../../components/MealBox/MealBox";
 import { Divider, ActivityIndicator } from "react-native-paper";
 import { Colors } from "@/constants/Colors";
-import { useState } from "react";
+import { createContext, useState } from "react";
 import Totals from "../../components/Totals/Totals";
 import { useCreateMeal, useGetMealsByDate } from "../../api/meals";
 import { useMutation } from "react-query";

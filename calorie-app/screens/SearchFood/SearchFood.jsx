@@ -13,18 +13,18 @@ import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import styles from "../../styles/general";
 import { searchFoodStyles as pageStyles } from "./SearchFoodStyles";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useFetchFoodData } from "@/hooks/useFetchFoodData";
 import SearchSuggestion from "../../components/SearchSuggestion/SearchSuggestion";
 import { SIZES } from "@/constants/sizes";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { EmptySearchResult } from "@/components/Alerts/Alerts";
+import { MealContext } from "@/hooks/useMealContext";
 
 const SearchFood = () => {
-  const navigation = useNavigation();
-  const router = useRoute();
+  const { selectedMeal } = useContext(MealContext);
 
-  const { meal } = router.params;
+  const navigation = useNavigation();
 
   const [searchedFood, setSearchedFood] = useState("");
   const [lastSearched, setLastSearched] = useState();
@@ -40,7 +40,6 @@ const SearchFood = () => {
 
     try {
       navigation.navigate("Food Edit", {
-        meal: meal,
         foodId: foodId,
         measureId: measureId,
         foodName: foodName,
@@ -56,7 +55,7 @@ const SearchFood = () => {
       <Divider style={styles.divider} />
       <Stack.Screen
         options={{
-          headerTitle: meal.title,
+          headerTitle: selectedMeal.title,
           headerStyle: styles.header,
           headerBackVisible: false,
           headerLeft: () => {

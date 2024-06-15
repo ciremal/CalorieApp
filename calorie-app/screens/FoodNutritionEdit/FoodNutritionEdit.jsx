@@ -8,7 +8,7 @@ import { Colors } from "@/constants/Colors";
 import { SIZES } from "../../constants/sizes";
 import { apiDefaults } from "../../constants/api";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { extractNutrientsFromApi } from "../../helpers/nutrientsHelpers";
 import roundNumbers from "../../helpers/roundNumbers";
@@ -17,18 +17,15 @@ import { useUpdateMealAddFoodItem } from "@/api/meals";
 import { useMutation, useQueryClient } from "react-query";
 import { SomethingWentWrong } from "@/components/Alerts/Alerts";
 import FoodNutritonForm from "@/components/Forms/FoodNutritionForm";
+import { MealContext } from "@/hooks/useMealContext";
 
 const FoodNutritionEdit = () => {
+  const { selectedMeal } = useContext(MealContext);
+
   const navigation = useNavigation();
   const router = useRoute();
 
-  const {
-    meal,
-    foodId,
-    measureId,
-    foodName: name,
-    measureOptions,
-  } = router.params;
+  const { foodId, measureId, foodName: name, measureOptions } = router.params;
   const [quantity, setQuantity] = useState(apiDefaults.quantity);
   const [unitOfMeasurement, setUnitOfMeasurement] = useState("Gram");
   const [nutrients, setNutrients] = useState([]);
@@ -51,9 +48,7 @@ const FoodNutritionEdit = () => {
     mutationFn: useUpdateMealAddFoodItem,
     onSuccess: async () => {
       await queryClient.refetchQueries();
-      navigation.navigate("Meal Summary", {
-        meal: meal,
-      });
+      navigation.navigate("Meal Summary");
     },
   });
 
@@ -106,7 +101,11 @@ const FoodNutritionEdit = () => {
       mainNutrients: mainNutrients,
     };
 
-    mutate({ id: meal._id, foodItem: foodItem, mainNutrients: mainNutrients });
+    mutate({
+      id: selectedMeal._id,
+      foodItem: foodItem,
+      mainNutrients: mainNutrients,
+    });
   };
 
   return (
@@ -115,7 +114,7 @@ const FoodNutritionEdit = () => {
         <Divider style={styles.divider} />
         <Stack.Screen
           options={{
-            headerTitle: meal.title,
+            headerTitle: selectedMeal.title,
             headerStyle: styles.header,
             headerBackVisible: false,
             headerLeft: () => {
@@ -157,7 +156,7 @@ const FoodNutritionEdit = () => {
                 handleAddFood={handleAddFood}
                 measures={measures}
                 nutrients={nutrients}
-                mealName={meal.title}
+                mealName={selectedMeal.title}
               />
             )}
           </View>

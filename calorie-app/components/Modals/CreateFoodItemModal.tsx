@@ -11,14 +11,12 @@ type CreateFoodItemModalProps = {
   visible: boolean;
   hideModal: () => void;
   navigation: any;
-  meal: any;
 };
 
 const CreateFoodItemModal = ({
   visible,
   hideModal,
   navigation,
-  meal,
 }: CreateFoodItemModalProps): JSX.Element => {
   return (
     <Portal>
@@ -35,7 +33,7 @@ const CreateFoodItemModal = ({
         >
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("Search Food", { meal: meal });
+              navigation.navigate("Search Food");
               hideModal();
             }}
           >

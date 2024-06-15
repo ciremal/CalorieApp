@@ -7,7 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { mealsStyles as pageStyles } from "./MealSummaryStyles";
 import styles from "../../styles/general";
 import Totals from "../../components/Totals/Totals";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import FoodItemBox from "../../components/FoodItemBox/FoodItemBox";
 import { FlatList } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -16,14 +16,15 @@ import { useDeleteFoodItem, useDeleteMeal, useGetMealById } from "@/api/meals";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
 import DeleteDialog from "@/components/DeleteDialog/DeleteDialog";
 import CreateFoodItemModal from "@/components/Modals/CreateFoodItemModal";
+import { MealContext } from "@/hooks/useMealContext";
 
 const MealSummary = () => {
-  const router = useRoute();
+  const { selectedMeal } = useContext(MealContext);
+
   const navigation = useNavigation();
   const queryClient = useQueryClient();
 
-  const { meal }: any = router.params;
-  const { _id: id, title, createdAt } = meal;
+  const { _id: id, title, createdAt } = selectedMeal;
 
   const [visibleModal, setVisibleModal] = useState(false);
   const showModal = () => setVisibleModal(true);
@@ -155,7 +156,6 @@ const MealSummary = () => {
               visible={visibleModal}
               hideModal={hideModal}
               navigation={navigation}
-              meal={meal}
             />
 
             <DeleteDialog

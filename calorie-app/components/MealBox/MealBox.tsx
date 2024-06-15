@@ -4,8 +4,16 @@ import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { SIZES } from "../../constants/sizes";
 import { useNavigation } from "@react-navigation/native";
+import { useContext } from "react";
+import { MealContext } from "@/hooks/useMealContext";
 
-const MealBox = ({ meal }: { meal: any }) => {
+type MealBoxProps = {
+  meal: any;
+};
+
+const MealBox = ({ meal }: MealBoxProps) => {
+  const { selectedMeal, setSelectedMeal } = useContext(MealContext);
+
   const navigation = useNavigation();
 
   const { cals, carbs, proteins, fats, title } = meal;
@@ -23,7 +31,10 @@ const MealBox = ({ meal }: { meal: any }) => {
           {title}
         </Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Meal Summary", { meal: meal })}
+          onPress={() => {
+            setSelectedMeal(meal);
+            navigation.navigate("Meal Summary");
+          }}
         >
           <Ionicons name="add-circle-outline" size={32} color="black" />
         </TouchableOpacity>
