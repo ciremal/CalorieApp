@@ -42,7 +42,12 @@ const CreateFoodItemModal = ({
               <Text style={pageStyles.addFoodOptionText}>Search</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Food Edit Manual");
+              hideModal();
+            }}
+          >
             <View style={[pageStyles.addFoodOption, styles.raisedStyle]}>
               <Entypo name="pencil" size={SIZES.xl3} color="black" />
               <Text style={pageStyles.addFoodOptionText}>Manual</Text>

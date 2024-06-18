@@ -9,6 +9,7 @@ import React, { createContext } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { LogBox } from "react-native";
 import { MealContextProvider } from "@/hooks/useMealContext";
+import FoodNutritionEditManual from "@/screens/FoodNutritionEditManual/FoodNutritionEditManual";
 
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
@@ -25,6 +26,10 @@ const Home = () => {
               <Stack.Screen name="Meal Summary" component={MealSummary} />
               <Stack.Screen name="Search Food" component={SearchFood} />
               <Stack.Screen name="Food Edit" component={FoodNutritionEdit} />
+              <Stack.Screen
+                name="Food Edit Manual"
+                component={FoodNutritionEditManual}
+              />
             </Stack.Navigator>
           </PaperProvider>
         </NavigationContainer>

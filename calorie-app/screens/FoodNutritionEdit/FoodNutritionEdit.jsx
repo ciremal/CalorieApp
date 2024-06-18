@@ -84,6 +84,8 @@ const FoodNutritionEdit = () => {
     }
   }, [quantity, unitOfMeasurement]);
 
+  console.log(nutrients);
+
   const handleAddFood = (foodName, quantity, unitOfMeasurement, notes) => {
     const mainNutrients = {
       cals: nutrients.find((item) => item.label === "Calories").quantity,
