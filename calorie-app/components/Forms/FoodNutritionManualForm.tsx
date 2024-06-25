@@ -6,6 +6,7 @@ import { Button } from "react-native-paper";
 import { FormStyles } from "./FormStyles";
 import { SIZES } from "@/constants/sizes";
 import { useState } from "react";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type FoodNutritonFormProps = {
   handleAddFood: any;
@@ -35,6 +36,28 @@ const FoodNutritonManualForm = ({
     },
     {}
   );
+
+  const renderItem = (item: any, values: any) => {
+    const labels = Object.keys(values);
+    return (
+      <View style={FormStyles.dropDownItem}>
+        <Text style={{ fontSize: SIZES.md }}>{item.label}</Text>
+        {labels.includes(item.label) ? (
+          <MaterialCommunityIcons
+            name="checkbox-intermediate"
+            size={24}
+            color={Colors.orange.text}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name="checkbox-blank-outline"
+            size={24}
+            color={Colors.orange.text}
+          />
+        )}
+      </View>
+    );
+  };
 
   const handleSelectNutrient = (
     nutrients: string[],
@@ -209,11 +232,11 @@ const FoodNutritonManualForm = ({
                 fontSize: SIZES.md,
               }}
               onChange={(item) => {
-                // setValues({ ...values, [item]: 0 });
                 handleSelectNutrient(item, values, setValues);
               }}
               search={false}
               placeholder={"Select nutrients to add"}
+              renderItem={(item) => renderItem(item, values)}
             />
 
             <FlatList

@@ -36,4 +36,11 @@ export const FormStyles = StyleSheet.create({
     borderBottomStartRadius: 10,
     borderBottomEndRadius: 10,
   },
+  dropDownItem: {
+    display: "flex",
+    flexDirection: "row",
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    justifyContent: "space-between",
+  },
 });

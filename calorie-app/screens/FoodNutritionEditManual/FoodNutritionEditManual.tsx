@@ -38,7 +38,7 @@ const FoodNutritionEditManual = () => {
       .map((item) => {
         return {
           label: item.label,
-          quantity: parseInt(values[item.label]),
+          quantity: parseFloat(values[item.label]),
           unit: item.unit,
         };
       });
