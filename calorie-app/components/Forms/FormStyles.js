@@ -19,10 +19,21 @@ export const FormStyles = StyleSheet.create({
     paddingVertical: 12,
     marginBottom: 12,
     marginTop: 5,
-    borderRadius: 12,
     borderColor: Colors.orange.text,
     fontSize: 20,
+    borderRadius: 12,
     color: Colors.lightOrange.text,
     width: "100%",
+  },
+  textInputDropdown: {
+    borderRadius: 0,
+  },
+  selectedItems: {
+    borderRadius: 12,
+    borderColor: Colors.orange.text,
+  },
+  containerList: {
+    borderBottomStartRadius: 10,
+    borderBottomEndRadius: 10,
   },
 });

@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { Formik } from "formik";
 import { FlatList, Text, TextInput, View } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
+import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import { Button } from "react-native-paper";
 import { FormStyles } from "./FormStyles";
 import { SIZES } from "@/constants/sizes";
@@ -21,12 +21,11 @@ const FoodNutritonManualForm = ({
   allNutrients,
 }: FoodNutritonFormProps): JSX.Element => {
   // Default, required nutrients
-  const [selectedNutrients, setSelectedNutrients] = useState<any>([
-    { label: "Calories", unit: "g", quantity: 0 },
-    { label: "Fats", unit: "g", quantity: 0 },
-    { label: "Carbs", unit: "g", quantity: 0 },
-    { label: "Proteins", unit: "g", quantity: 0 },
-  ]);
+  const mainNutrients = ["Calories", "Fats", "Carbs", "Proteins"];
+
+  const [selectedNutrients, setSelectedNutrients] = useState<any>(
+    allNutrients.filter((item) => mainNutrients.includes(item.label))
+  );
 
   // Declare initial form values
   const nutrientsObjects = selectedNutrients.reduce(
@@ -36,35 +35,51 @@ const FoodNutritonManualForm = ({
     },
     {}
   );
-  const initialValues = {
-    foodName: "",
-    quantity: 100,
-    unitOfMeasurement: { label: "Gram" },
-    notes: "",
-    ...nutrientsObjects,
-  };
 
-  const handleSelectNutrient = (nutrient: string) => {
-    const labels = selectedNutrients.map((item: any) => item.label);
-    if (!labels.includes(nutrient)) {
-      const newNutrient = allNutrients.find((item) => item.label === nutrient);
-      setSelectedNutrients((prev: any) => [...prev, newNutrient]);
-    } else {
-      setSelectedNutrients((prev: any[]) =>
-        prev.filter((item: any) => item.label !== nutrient)
+  const handleSelectNutrient = (
+    nutrients: string[],
+    values: any,
+    setValues: any
+  ) => {
+    const currentNutrients = selectedNutrients.map((item: any) => item.label);
+
+    // Nutrient was added
+    if (currentNutrients.length < nutrients.length) {
+      // Finds the new nutrient added
+      const addedNutrient = nutrients.filter(
+        (item) => !currentNutrients.includes(item)
       );
+      setValues({ ...values, [addedNutrient[0]]: 0 });
+    } else {
+      // Nutrient was removed
+      const removedNutrient = currentNutrients.filter(
+        (item: any) => !nutrients.includes(item)
+      );
+      delete values[removedNutrient];
+      setValues({ ...values });
     }
+
+    const newNutrients = allNutrients.filter((item) =>
+      nutrients.includes(item.label)
+    );
+    setSelectedNutrients(newNutrients);
   };
 
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={{
+        foodName: "",
+        quantity: 100,
+        unitOfMeasurement: { label: "Gram" },
+        notes: "",
+        ...nutrientsObjects,
+      }}
       validate={(values) => {
         const errors = {};
         if (!values.foodName) {
           errors.foodName = "Food name is required";
-        } else if (values.foodName.length > 25) {
-          errors.foodName = "Food name should be between 1 and 25 characters";
+        } else if (values.foodName.length > 50) {
+          errors.foodName = "Food name should be between 1 and 50 characters";
         }
 
         if (!values.quantity) {
@@ -86,13 +101,13 @@ const FoodNutritonManualForm = ({
       onSubmit={(values) => {
         handleAddFood(values);
       }}
-      enableReinitialize
     >
       {({
         handleChange,
         handleBlur,
         handleSubmit,
         values,
+        setValues,
         errors,
         setFieldValue,
       }) => (
@@ -102,7 +117,9 @@ const FoodNutritonManualForm = ({
             <TextInput
               style={FormStyles.textInput}
               value={values.foodName}
-              onChangeText={handleChange("foodName")}
+              onChangeText={(item) => {
+                setFieldValue("foodName", item);
+              }}
               onBlur={handleBlur("foodName")}
             />
             {errors.foodName && (
@@ -148,7 +165,7 @@ const FoodNutritonManualForm = ({
               labelField={"label"}
               valueField={"label"}
               value={values.unitOfMeasurement.label}
-              style={FormStyles.textInput}
+              style={[FormStyles.textInput, FormStyles.textInputDropdown]}
               placeholderStyle={{
                 color: Colors.lightOrange.text,
                 textAlign: "left",
@@ -159,9 +176,9 @@ const FoodNutritonManualForm = ({
                 textAlign: "left",
                 fontSize: SIZES.lg,
               }}
-              onChange={(item) =>
-                setFieldValue("unitOfMeasurement", item.label)
-              }
+              onChange={(item) => {
+                setFieldValue("unitOfMeasurement", item);
+              }}
               search={false}
               placeholder={"Gram"}
             />
@@ -171,16 +188,16 @@ const FoodNutritonManualForm = ({
             style={{ paddingHorizontal: 10, marginLeft: 5 }}
           >
             <Text style={{ fontSize: 18 }}>Nutrients</Text>
-            <Dropdown
+            <MultiSelect
               data={allNutrients.filter(
-                (item) =>
-                  !["Calories", "Fats", "Carbs", "Proteins"].includes(
-                    item.label
-                  )
+                (item) => !mainNutrients.includes(item.label)
               )}
               labelField={"label"}
               valueField={"label"}
-              style={FormStyles.textInput}
+              value={selectedNutrients.map((item: any) => item.label)}
+              style={[FormStyles.textInput, FormStyles.textInputDropdown]}
+              containerStyle={FormStyles.containerList}
+              selectedStyle={FormStyles.selectedItems}
               placeholderStyle={{
                 color: Colors.lightOrange.text,
                 textAlign: "left",
@@ -189,24 +206,29 @@ const FoodNutritonManualForm = ({
               selectedTextStyle={{
                 color: Colors.lightOrange.text,
                 textAlign: "left",
-                fontSize: SIZES.lg,
+                fontSize: SIZES.md,
               }}
-              onChange={(item) => handleSelectNutrient(item.label)}
+              onChange={(item) => {
+                // setValues({ ...values, [item]: 0 });
+                handleSelectNutrient(item, values, setValues);
+              }}
               search={false}
               placeholder={"Select nutrients to add"}
             />
-            {console.log(values)}
+
             <FlatList
               scrollEnabled={false}
               data={selectedNutrients}
               renderItem={({ item }) => (
                 <View>
-                  <Text>{item.label}</Text>
+                  <Text>{`${item.label} ${item.unit}`}</Text>
                   <TextInput
                     inputMode="decimal"
                     style={FormStyles.textInput}
                     value={
-                      values[item.label] ? values[item.label].toString() : "0"
+                      values[item.label] !== undefined
+                        ? values[item.label].toString()
+                        : "0"
                     }
                     onChangeText={handleChange(item.label)}
                     onBlur={handleBlur(item.label)}
