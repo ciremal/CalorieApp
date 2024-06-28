@@ -6,6 +6,7 @@ import {
   TextInput,
   FlatList,
   Text,
+  Keyboard,
 } from "react-native";
 import { ActivityIndicator, Divider } from "react-native-paper";
 import { Stack } from "expo-router";
@@ -96,6 +97,7 @@ const SearchFood = () => {
               setQuery(searchedFood);
               setLastSearched(searchedFood);
               setSearchedFood("");
+              Keyboard.dismiss();
             }}
           >
             <AntDesign name="search1" size={30} color="black" />
