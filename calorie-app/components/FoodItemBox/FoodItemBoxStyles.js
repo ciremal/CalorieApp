@@ -26,17 +26,20 @@ export const foodItemBoxStyles = StyleSheet.create({
     flexDirection: "row",
   },
   notesDropdown: {
+    width: "100%",
     backgroundColor: Colors.lightOrange.text,
-    paddingVertical: 0,
-    paddingLeft: "3%",
-    color: Colors.lightWhite.text,
-    fontWeight: "500",
+    paddingVertical: "5%",
+    paddingHorizontal: "4%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
   },
   notes: {
     backgroundColor: Colors.lightOrange.text,
-    paddingHorizontal: "5%",
+    paddingHorizontal: "15%",
     color: Colors.lightWhite.text,
     fontStyle: "italic",
+    fontSize: SIZES.md,
   },
   nutritionNumber: {
     color: Colors.lightWhite.text,
@@ -54,5 +57,13 @@ export const foodItemBoxStyles = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row",
     maxWidth: "80%",
+  },
+  roundedCornersTop: {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  roundedCornersBottom: {
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
 });

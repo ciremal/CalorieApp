@@ -3,9 +3,9 @@ import { foodItemBoxStyles } from "./FoodItemBoxStyles";
 import { Colors } from "@/constants/Colors";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import { useState } from "react";
-import { List } from "react-native-paper";
 import DeleteDialog from "../DeleteDialog/DeleteDialog";
 import { SIZES } from "@/constants/sizes";
+import Accordion from "../Accordion/Accordion";
 
 type FoodItemBoxProps = {
   foodItem: any;
@@ -23,15 +23,33 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
   } = foodItem;
   const { cals, carbs, fats, proteins } = mainNutrients;
 
-  const [expanded, setExpanded] = useState(false);
-
   const [visible, setVisible] = useState(false);
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
 
+  const [openNotes, setOpenNotes] = useState(false);
+
+  const Notes = () => {
+    return (
+      <View
+        style={[
+          foodItemBoxStyles.notesDropdown,
+          foodItemBoxStyles.roundedCornersBottom,
+        ]}
+      >
+        <Text style={foodItemBoxStyles.notes}>{notes}</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={foodItemBoxStyles.foodBox}>
-      <View style={foodItemBoxStyles.foodBoxLayer1}>
+      <View
+        style={[
+          foodItemBoxStyles.foodBoxLayer1,
+          foodItemBoxStyles.roundedCornersTop,
+        ]}
+      >
         <Text style={foodItemBoxStyles.foodItemTitle}>
           {`${name} (${quantity} ${unitOfMeasurement})`}
         </Text>
@@ -40,7 +58,12 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
         </TouchableOpacity>
       </View>
 
-      <View style={foodItemBoxStyles.foodBoxLayer2}>
+      <View
+        style={[
+          foodItemBoxStyles.foodBoxLayer2,
+          !notes ? foodItemBoxStyles.roundedCornersBottom : null,
+        ]}
+      >
         <Text style={foodItemBoxStyles.nutritionNumber}>{fats}</Text>
         <Text style={foodItemBoxStyles.nutritionNumber}>{carbs}</Text>
         <Text style={foodItemBoxStyles.nutritionNumber}>{proteins}</Text>
@@ -48,27 +71,39 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
       </View>
 
       {notes && (
-        <List.Accordion
-          style={foodItemBoxStyles.notesDropdown}
-          titleStyle={foodItemBoxStyles.notesDropdown}
-          title="Notes"
-          expanded={expanded}
-          onPress={() => setExpanded(!expanded)}
-          right={() => (
+        <>
+          <TouchableOpacity
+            style={[
+              foodItemBoxStyles.foodBoxLayer1,
+              !openNotes ? foodItemBoxStyles.roundedCornersBottom : null,
+              {
+                marginBottom: -1,
+                paddingHorizontal: "7%",
+                paddingVertical: "4%",
+              },
+            ]}
+            onPress={() => setOpenNotes(!openNotes)}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={{
+                fontSize: SIZES.md,
+                color: Colors.lightWhite.text,
+                fontWeight: "500",
+              }}
+            >
+              Notes
+            </Text>
             <AntDesign
-              name={expanded ? "caretup" : "caretdown"}
+              name={openNotes ? "caretup" : "caretdown"}
               size={SIZES.md}
               color={Colors.lightWhite.text}
             />
-          )}
-        >
-          <List.Item
-            title={notes}
-            titleNumberOfLines={notes.length}
-            style={foodItemBoxStyles.notes}
-            titleStyle={foodItemBoxStyles.notes}
-          />
-        </List.Accordion>
+          </TouchableOpacity>
+          <View>
+            <Accordion open={openNotes} item={Notes} />
+          </View>
+        </>
       )}
 
       <DeleteDialog

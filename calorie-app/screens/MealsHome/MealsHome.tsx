@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   Text,
   SafeAreaView,
+  Button,
 } from "react-native";
 import { Stack } from "expo-router";
 import {
@@ -23,6 +24,7 @@ import { Feather, Entypo } from "@expo/vector-icons";
 import { dateToday, dateYesterday } from "@/helpers/dates";
 import CalendarModal from "@/components/Modals/CalendarModal";
 import CreateMealModal from "@/components/Modals/CreateMealModal";
+import Accordion from "@/components/Accordion/Accordion";
 
 const MealsHome = () => {
   const [visible, setVisible] = useState(false);
