@@ -25,6 +25,19 @@ export const foodItemBoxStyles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
+  notesDropdown: {
+    backgroundColor: Colors.lightOrange.text,
+    paddingVertical: 0,
+    paddingLeft: "3%",
+    color: Colors.lightWhite.text,
+    fontWeight: "500",
+  },
+  notes: {
+    backgroundColor: Colors.lightOrange.text,
+    paddingHorizontal: "5%",
+    color: Colors.lightWhite.text,
+    fontStyle: "italic",
+  },
   nutritionNumber: {
     color: Colors.lightWhite.text,
     fontSize: SIZES.md,

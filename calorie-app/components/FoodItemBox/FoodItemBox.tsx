@@ -1,9 +1,11 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { foodItemBoxStyles } from "./FoodItemBoxStyles";
 import { Colors } from "@/constants/Colors";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import { useState } from "react";
+import { List } from "react-native-paper";
 import DeleteDialog from "../DeleteDialog/DeleteDialog";
+import { SIZES } from "@/constants/sizes";
 
 type FoodItemBoxProps = {
   foodItem: any;
@@ -17,8 +19,11 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
     quantity,
     unitOfMeasurement,
     mainNutrients,
+    notes,
   } = foodItem;
   const { cals, carbs, fats, proteins } = mainNutrients;
+
+  const [expanded, setExpanded] = useState(false);
 
   const [visible, setVisible] = useState(false);
   const showDialog = () => setVisible(true);
@@ -41,6 +46,30 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
         <Text style={foodItemBoxStyles.nutritionNumber}>{proteins}</Text>
         <Text style={foodItemBoxStyles.nutritionNumberCalorie}>{cals}</Text>
       </View>
+
+      {notes && (
+        <List.Accordion
+          style={foodItemBoxStyles.notesDropdown}
+          titleStyle={foodItemBoxStyles.notesDropdown}
+          title="Notes"
+          expanded={expanded}
+          onPress={() => setExpanded(!expanded)}
+          right={() => (
+            <AntDesign
+              name={expanded ? "caretup" : "caretdown"}
+              size={SIZES.md}
+              color={Colors.lightWhite.text}
+            />
+          )}
+        >
+          <List.Item
+            title={notes}
+            titleNumberOfLines={notes.length}
+            style={foodItemBoxStyles.notes}
+            titleStyle={foodItemBoxStyles.notes}
+          />
+        </List.Accordion>
+      )}
 
       <DeleteDialog
         visible={visible}
