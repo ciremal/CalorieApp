@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { foodItemBoxStyles } from "./FoodItemBoxStyles";
 import { Colors } from "@/constants/Colors";
-import { FontAwesome, AntDesign } from "@expo/vector-icons";
+import { FontAwesome, AntDesign, Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import DeleteDialog from "../DeleteDialog/DeleteDialog";
 import { SIZES } from "@/constants/sizes";
@@ -35,27 +35,17 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
 
   const Notes = () => {
     return (
-      <TouchableOpacity
+      <View
         style={[
           foodItemBoxStyles.notesDropdownContainer,
           foodItemBoxStyles.roundedCornersBottom,
         ]}
         activeOpacity={0.8}
-        onPress={() =>
-          navigation.navigate("Food Edit Manual", { foodItem: foodItem })
-        }
       >
         <View style={foodItemBoxStyles.notesDropdown}>
           <Text style={foodItemBoxStyles.notes}>{notes}</Text>
         </View>
-        <View style={foodItemBoxStyles.notesDropdownEditIcon}>
-          <AntDesign
-            name={"caretright"}
-            size={SIZES.md}
-            color={Colors.lightWhite.text}
-          />
-        </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
@@ -67,12 +57,31 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
           foodItemBoxStyles.roundedCornersTop,
         ]}
       >
-        <Text style={foodItemBoxStyles.foodItemTitle}>
-          {`${name} (${quantity} ${unitOfMeasurement})`}
-        </Text>
-        <TouchableOpacity onPress={() => showDialog()}>
-          <FontAwesome name="trash-o" size={32} color={Colors.black.text} />
-        </TouchableOpacity>
+        <View style={foodItemBoxStyles.foodItemTitleContainer}>
+          <Text
+            style={[
+              foodItemBoxStyles.foodItemTitle,
+              { fontSize: name.length > 25 ? SIZES.md : SIZES.lg },
+            ]}
+          >
+            {name}
+          </Text>
+          <Text
+            style={foodItemBoxStyles.foodItemSubTitle}
+          >{`(${quantity} ${unitOfMeasurement})`}</Text>
+        </View>
+        <View style={foodItemBoxStyles.foodItemButtons}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Food Edit Manual", { foodItem: foodItem })
+            }
+          >
+            <Feather name="edit" size={30} color={Colors.black.text} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => showDialog()}>
+            <FontAwesome name="trash-o" size={32} color={Colors.black.text} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View

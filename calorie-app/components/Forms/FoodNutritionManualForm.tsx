@@ -111,8 +111,8 @@ const FoodNutritonManualForm = ({
         const errors = {};
         if (!values.foodName) {
           errors.foodName = "Food name is required";
-        } else if (values.foodName.length > 50) {
-          errors.foodName = "Food name should be between 1 and 50 characters";
+        } else if (values.foodName.length > 100) {
+          errors.foodName = "Food name should be between 1 and 100 characters";
         }
 
         if (!values.quantity) {
@@ -305,7 +305,7 @@ const FoodNutritonManualForm = ({
             labelStyle={{ fontSize: 18 }}
             onPress={() => handleSubmit()}
           >
-            Add to {mealName}
+            {foodItem ? `Save Changes` : `Add to ${mealName}`}
           </Button>
         </View>
       )}

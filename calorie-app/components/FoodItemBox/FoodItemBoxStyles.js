@@ -41,7 +41,7 @@ export const foodItemBoxStyles = StyleSheet.create({
     justifyContent: "space-between",
   },
   notesDropdown: {
-    width: "90%",
+    width: "100%",
     paddingVertical: "5%",
     paddingHorizontal: "8%",
     display: "flex",
@@ -70,13 +70,29 @@ export const foodItemBoxStyles = StyleSheet.create({
     fontSize: SIZES.md,
     fontWeight: "bold",
   },
+  foodItemTitleContainer: {
+    width: "70%",
+    display: "flex",
+    rowGap: 5,
+  },
   foodItemTitle: {
     color: Colors.lightWhite.text,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
     flexWrap: "wrap",
     flexDirection: "row",
-    maxWidth: "80%",
+  },
+  foodItemSubTitle: {
+    color: Colors.lightWhite.text,
+    fontSize: SIZES.md,
+    fontWeight: "600",
+  },
+  foodItemButtons: {
+    width: "25%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   roundedCornersTop: {
     borderTopLeftRadius: 12,

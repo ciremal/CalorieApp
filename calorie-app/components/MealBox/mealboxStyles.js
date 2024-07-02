@@ -15,6 +15,8 @@ const mealboxStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   mealBoxLayer2: {
     backgroundColor: Colors.orange.text,
@@ -24,6 +26,8 @@ const mealboxStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
   nutritionNumber: {
     color: Colors.lightWhite.text,

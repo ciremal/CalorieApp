@@ -40,8 +40,8 @@ const FoodNutritonForm = ({
         const errors = {};
         if (!values.foodName) {
           errors.foodName = "Food name is required";
-        } else if (values.foodName.length > 50) {
-          errors.foodName = "Food name should be between 1 and 50 characters";
+        } else if (values.foodName.length > 100) {
+          errors.foodName = "Food name should be between 1 and 100 characters";
         }
         if (!values.quantity) {
           errors.quantity = "Quantity is required";
