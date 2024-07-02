@@ -10,22 +10,30 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type FoodNutritonFormProps = {
   handleAddFood: any;
+  handleEditFood: any;
   mealName: string;
   measures: any[];
   allNutrients: any[];
+  params: any;
 };
 
 const FoodNutritonManualForm = ({
   handleAddFood,
+  handleEditFood,
   mealName,
   measures,
   allNutrients,
+  params,
 }: FoodNutritonFormProps): JSX.Element => {
+  const foodItem = params ? params.foodItem : null;
+
   // Default, required nutrients
   const mainNutrients = ["Calories", "Fats", "Carbs", "Proteins"];
 
   const [selectedNutrients, setSelectedNutrients] = useState<any>(
-    allNutrients.filter((item) => mainNutrients.includes(item.label))
+    foodItem
+      ? foodItem.nutrients
+      : allNutrients.filter((item) => mainNutrients.includes(item.label))
   );
 
   // Declare initial form values
@@ -91,10 +99,12 @@ const FoodNutritonManualForm = ({
   return (
     <Formik
       initialValues={{
-        foodName: "",
-        quantity: 100,
-        unitOfMeasurement: { label: "Gram" },
-        notes: "",
+        foodName: foodItem ? foodItem.name : "",
+        quantity: foodItem ? foodItem.quantity : 100,
+        unitOfMeasurement: {
+          label: foodItem ? foodItem.unitOfMeasurement : "Gram",
+        },
+        notes: foodItem ? foodItem.notes : "",
         ...nutrientsObjects,
       }}
       validate={(values) => {
@@ -122,7 +132,11 @@ const FoodNutritonManualForm = ({
         return errors;
       }}
       onSubmit={(values) => {
-        handleAddFood(values);
+        if (foodItem) {
+          handleEditFood(foodItem._id, values, foodItem.mainNutrients);
+        } else {
+          handleAddFood(values);
+        }
       }}
     >
       {({

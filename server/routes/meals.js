@@ -195,6 +195,47 @@ router.post("/updateMealAddFoodItem", async (req, res) => {
   }
 });
 
+router.post("/updateFoodItem", async (req, res) => {
+  try {
+    const { id, foodItemId, foodItem, mainNutrients, oldMainNutrients } =
+      req.body;
+    const { cals, carbs, fats, proteins } = mainNutrients;
+    const updatedFoodItem = await FoodItemModel.updateOne(
+      { _id: foodItemId },
+      {
+        name: foodItem.name,
+        quantity: foodItem.quantity,
+        unitOfMeasurement: foodItem.unitOfMeasurement,
+        notes: foodItem.notes,
+        nutrients: foodItem.nutrients,
+        mainNutrients: mainNutrients,
+      }
+    );
+
+    const meal = await MealModel.findById(id);
+    meal.cals = roundNumbers(meal.cals + cals - oldMainNutrients.cals);
+    meal.carbs = roundNumbers(meal.carbs + carbs - oldMainNutrients.carbs);
+    meal.fats = roundNumbers(meal.fats + fats - oldMainNutrients.fats);
+    meal.proteins = roundNumbers(
+      meal.proteins + proteins - oldMainNutrients.proteins
+    );
+
+    await meal.save();
+
+    res.status(201).json({
+      success: true,
+      message: "FoodItem updated successfully",
+      data: updatedFoodItem,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating FoodItem",
+      error: error,
+    });
+  }
+});
+
 //BOILERPLATE ROUTE
 // router.post("/name", async (req, res) => {
 //   try {

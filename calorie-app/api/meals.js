@@ -101,6 +101,30 @@ export const useUpdateMealAddFoodItem = async ({
     });
 };
 
+export const useUpdateFoodItem = async ({
+  id,
+  foodItemId,
+  foodItem,
+  mainNutrients,
+  oldMainNutrients,
+}) => {
+  return axios
+    .post(`http://${backendIp}:5000/meals/updateFoodItem`, {
+      id,
+      foodItemId,
+      foodItem,
+      mainNutrients,
+      oldMainNutrients,
+    })
+    .then((res) => {
+      const { data } = res.data;
+      return data;
+    })
+    .catch((err) => {
+      throw err.response.data;
+    });
+};
+
 // BOILDERPLATE API Call GET
 // export const name = () => {
 //   return useQuery(["name"], async () => {

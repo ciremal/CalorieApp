@@ -6,6 +6,7 @@ import { useState } from "react";
 import DeleteDialog from "../DeleteDialog/DeleteDialog";
 import { SIZES } from "@/constants/sizes";
 import Accordion from "../Accordion/Accordion";
+import { useNavigation } from "@react-navigation/native";
 
 type FoodItemBoxProps = {
   foodItem: any;
@@ -21,6 +22,9 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
     mainNutrients,
     notes,
   } = foodItem;
+
+  const navigation = useNavigation();
+
   const { cals, carbs, fats, proteins } = mainNutrients;
 
   const [visible, setVisible] = useState(false);
@@ -31,14 +35,27 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
 
   const Notes = () => {
     return (
-      <View
+      <TouchableOpacity
         style={[
-          foodItemBoxStyles.notesDropdown,
+          foodItemBoxStyles.notesDropdownContainer,
           foodItemBoxStyles.roundedCornersBottom,
         ]}
+        activeOpacity={0.8}
+        onPress={() =>
+          navigation.navigate("Food Edit Manual", { foodItem: foodItem })
+        }
       >
-        <Text style={foodItemBoxStyles.notes}>{notes}</Text>
-      </View>
+        <View style={foodItemBoxStyles.notesDropdown}>
+          <Text style={foodItemBoxStyles.notes}>{notes}</Text>
+        </View>
+        <View style={foodItemBoxStyles.notesDropdownEditIcon}>
+          <AntDesign
+            name={"caretright"}
+            size={SIZES.md}
+            color={Colors.lightWhite.text}
+          />
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -74,13 +91,8 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
         <>
           <TouchableOpacity
             style={[
-              foodItemBoxStyles.foodBoxLayer1,
+              foodItemBoxStyles.notesDropdownButton,
               !openNotes ? foodItemBoxStyles.roundedCornersBottom : null,
-              {
-                marginBottom: -1,
-                paddingHorizontal: "7%",
-                paddingVertical: "4%",
-              },
             ]}
             onPress={() => setOpenNotes(!openNotes)}
             activeOpacity={0.7}
