@@ -28,4 +28,11 @@ export const modalStyles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 50,
   },
+
+  nutrientBreakdownRenderItem: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 });

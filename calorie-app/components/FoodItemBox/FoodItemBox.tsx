@@ -1,12 +1,14 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { foodItemBoxStyles } from "./FoodItemBoxStyles";
 import { Colors } from "@/constants/Colors";
-import { FontAwesome, AntDesign, Feather } from "@expo/vector-icons";
+import { FontAwesome, AntDesign, Feather, Entypo } from "@expo/vector-icons";
 import { useState } from "react";
 import DeleteDialog from "../DeleteDialog/DeleteDialog";
 import { SIZES } from "@/constants/sizes";
 import Accordion from "../Accordion/Accordion";
 import { useNavigation } from "@react-navigation/native";
+import { Divider } from "react-native-paper";
+import NutrientBreakdownModal from "../Modals/NutrientBreakdownModal";
 
 type FoodItemBoxProps = {
   foodItem: any;
@@ -19,6 +21,7 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
     name,
     quantity,
     unitOfMeasurement,
+    nutrients,
     mainNutrients,
     notes,
   } = foodItem;
@@ -33,18 +36,47 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
 
   const [openNotes, setOpenNotes] = useState(false);
 
+  const [nutrientBreakdownVisible, setNutrientBreakdownVisible] =
+    useState(false);
+  const showNutrientBreakdown = () => setNutrientBreakdownVisible(true);
+  const hideNutrientBreakdown = () => setNutrientBreakdownVisible(false);
+
   const Notes = () => {
     return (
       <View
         style={[
-          foodItemBoxStyles.notesDropdownContainer,
+          foodItemBoxStyles.dropdownContainer,
           foodItemBoxStyles.roundedCornersBottom,
         ]}
-        activeOpacity={0.8}
       >
-        <View style={foodItemBoxStyles.notesDropdown}>
-          <Text style={foodItemBoxStyles.notes}>{notes}</Text>
+        <View style={foodItemBoxStyles.dropdown}>
+          <View style={foodItemBoxStyles.notesContainer}>
+            <Text style={foodItemBoxStyles.notesHeader}>Notes</Text>
+            <Text style={foodItemBoxStyles.notesBody}>{notes}</Text>
+          </View>
+          <TouchableOpacity
+            style={foodItemBoxStyles.nutrientBreakdownContainer}
+            activeOpacity={0.7}
+            onPress={showNutrientBreakdown}
+          >
+            <Text style={foodItemBoxStyles.nutrientBreakdownButton}>
+              View Nutrient Breakdown
+            </Text>
+            <Entypo name="eye" size={24} color={Colors.lightWhite.text} />
+          </TouchableOpacity>
         </View>
+        {/* <View style={foodItemBoxStyles.dropdownEditIcon}>
+          <AntDesign
+            name="caretright"
+            size={SIZES.md}
+            color={Colors.lightWhite.text}
+          />
+        </View> */}
+        <NutrientBreakdownModal
+          visible={nutrientBreakdownVisible}
+          hideModal={hideNutrientBreakdown}
+          nutrients={nutrients}
+        />
       </View>
     );
   };
@@ -84,48 +116,39 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
         </View>
       </View>
 
-      <View
-        style={[
-          foodItemBoxStyles.foodBoxLayer2,
-          !notes ? foodItemBoxStyles.roundedCornersBottom : null,
-        ]}
-      >
+      <View style={foodItemBoxStyles.foodBoxLayer2}>
         <Text style={foodItemBoxStyles.nutritionNumber}>{fats}</Text>
         <Text style={foodItemBoxStyles.nutritionNumber}>{carbs}</Text>
         <Text style={foodItemBoxStyles.nutritionNumber}>{proteins}</Text>
         <Text style={foodItemBoxStyles.nutritionNumberCalorie}>{cals}</Text>
       </View>
 
-      {notes && (
-        <>
-          <TouchableOpacity
-            style={[
-              foodItemBoxStyles.notesDropdownButton,
-              !openNotes ? foodItemBoxStyles.roundedCornersBottom : null,
-            ]}
-            onPress={() => setOpenNotes(!openNotes)}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={{
-                fontSize: SIZES.md,
-                color: Colors.lightWhite.text,
-                fontWeight: "500",
-              }}
-            >
-              Notes
-            </Text>
-            <AntDesign
-              name={openNotes ? "caretup" : "caretdown"}
-              size={SIZES.md}
-              color={Colors.lightWhite.text}
-            />
-          </TouchableOpacity>
-          <View>
-            <Accordion open={openNotes} item={Notes} />
-          </View>
-        </>
-      )}
+      <TouchableOpacity
+        style={[
+          foodItemBoxStyles.dropdownButton,
+          !openNotes ? foodItemBoxStyles.roundedCornersBottom : null,
+        ]}
+        onPress={() => setOpenNotes(!openNotes)}
+        activeOpacity={0.7}
+      >
+        <Text
+          style={{
+            fontSize: SIZES.md,
+            color: Colors.lightWhite.text,
+            fontWeight: "500",
+          }}
+        >
+          More information...
+        </Text>
+        <AntDesign
+          name={openNotes ? "caretup" : "caretdown"}
+          size={SIZES.md}
+          color={Colors.lightWhite.text}
+        />
+      </TouchableOpacity>
+      <View>
+        <Accordion open={openNotes} item={Notes} />
+      </View>
 
       <DeleteDialog
         visible={visible}
