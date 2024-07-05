@@ -50,10 +50,6 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
         ]}
       >
         <View style={foodItemBoxStyles.dropdown}>
-          <View style={foodItemBoxStyles.notesContainer}>
-            <Text style={foodItemBoxStyles.notesHeader}>Notes</Text>
-            <Text style={foodItemBoxStyles.notesBody}>{notes}</Text>
-          </View>
           <TouchableOpacity
             style={foodItemBoxStyles.nutrientBreakdownContainer}
             activeOpacity={0.7}
@@ -64,6 +60,10 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
             </Text>
             <Entypo name="eye" size={24} color={Colors.lightWhite.text} />
           </TouchableOpacity>
+          <View style={foodItemBoxStyles.notesContainer}>
+            <Text style={foodItemBoxStyles.notesHeader}>Notes</Text>
+            <Text style={foodItemBoxStyles.notesBody}>{notes}</Text>
+          </View>
         </View>
         {/* <View style={foodItemBoxStyles.dropdownEditIcon}>
           <AntDesign
