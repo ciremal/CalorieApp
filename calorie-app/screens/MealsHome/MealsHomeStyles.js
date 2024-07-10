@@ -6,6 +6,7 @@ export const mealsHomeStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: "8%",
+    paddingBottom: 100,
   },
 
   addMealButton: {
