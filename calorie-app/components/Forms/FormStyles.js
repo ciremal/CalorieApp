@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { SIZES } from "@/constants/sizes";
 import { StyleSheet } from "react-native";
 
 export const FormStyles = StyleSheet.create({
@@ -42,5 +43,18 @@ export const FormStyles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 15,
     justifyContent: "space-between",
+  },
+  authTextInput: {
+    paddingHorizontal: 15,
+    paddingVertical: 18,
+    fontSize: SIZES.md,
+    borderRadius: 8,
+    color: Colors.black.text,
+    width: "100%",
+    backgroundColor: Colors.bleachOrange.text,
+  },
+  authTextInputContainer: {
+    width: "100%",
+    rowGap: 5,
   },
 });

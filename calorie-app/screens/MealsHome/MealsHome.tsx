@@ -70,47 +70,6 @@ const MealsHome = () => {
     hideCalendar();
   };
 
-  // const getDRIResults = (nutrient: string) => {
-  //   const DRI = {
-  //     cals: {
-  //       lower: 1900,
-  //       upper: 2100,
-  //     },
-  //     fats: {
-  //       lower: 125,
-  //       upper: 175,
-  //     },
-  //     carbs: {
-  //       lower: 215,
-  //       upper: 285,
-  //     },
-  //     proteins: {
-  //       lower: 90,
-  //       upper: 110,
-  //     },
-  //   };
-  //   if (
-  //     getTotalNutrient(nutrient, meals) >= DRI[nutrient].lower &&
-  //     getTotalNutrient(nutrient, meals) <= DRI[nutrient].upper
-  //   ) {
-  //     return "In range of recommended";
-  //   } else if (
-  //     getTotalNutrient(nutrient, meals) >= 0.9 * DRI[nutrient].lower &&
-  //     getTotalNutrient(nutrient, meals) < DRI[nutrient].lower
-  //   ) {
-  //     return "Slightly under recommended";
-  //   } else if (
-  //     getTotalNutrient(nutrient, meals) <= 1.1 * DRI[nutrient].upper &&
-  //     getTotalNutrient(nutrient, meals) > DRI[nutrient].upper
-  //   ) {
-  //     return "Slightly above recommended";
-  //   } else if (getTotalNutrient(nutrient, meals) > 1.1 * DRI[nutrient].upper) {
-  //     return "Above the recommended";
-  //   } else {
-  //     return "Under the recommended";
-  //   }
-  // };
-
   const getDRI = (
     nutrient: string,
     weight: number,
@@ -148,25 +107,6 @@ const MealsHome = () => {
       )}`;
     } else {
       return 0;
-    }
-  };
-
-  const getAMDR = (nutrient: string, cals: number) => {
-    switch (nutrient) {
-      case "fats":
-        return `${roundNumbers((cals * 0.2) / 9)}-${roundNumbers(
-          (cals * 0.35) / 9
-        )} grams`;
-      case "proteins":
-        return `${roundNumbers((cals * 0.1) / 4)}-${roundNumbers(
-          (cals * 0.35) / 4
-        )} grams`;
-      case "carbs":
-        return `${roundNumbers((cals * 0.45) / 4)}-${roundNumbers(
-          (cals * 0.65) / 4
-        )} grams`;
-      default:
-        break;
     }
   };
 

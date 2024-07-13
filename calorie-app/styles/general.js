@@ -1,8 +1,9 @@
+import { Colors } from "@/constants/Colors";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: "white",
+    backgroundColor: Colors.lightWhite.text,
   },
 
   divider: {
@@ -10,7 +11,7 @@ const styles = StyleSheet.create({
   },
 
   body: {
-    backgroundColor: "white",
+    backgroundColor: Colors.lightWhite.text,
     flex: 1,
   },
 
