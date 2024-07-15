@@ -45,12 +45,11 @@ export const FormStyles = StyleSheet.create({
     justifyContent: "space-between",
   },
   authTextInput: {
-    paddingHorizontal: 15,
+    // paddingHorizontal: 15,
     paddingVertical: 18,
     fontSize: SIZES.md,
-    borderRadius: 8,
     color: Colors.black.text,
-    width: "100%",
+    width: "85%",
     backgroundColor: Colors.bleachOrange.text,
   },
   authTextInputContainer: {

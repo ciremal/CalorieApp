@@ -1,15 +1,18 @@
-import React, { useState } from "react";
-import { Button, Text, TextInput, View } from "react-native";
+import React from "react";
+import { Text, TextInput, View } from "react-native";
 import { Formik } from "formik";
 import { FormStyles } from "./FormStyles";
 import { Colors } from "@/constants/Colors";
-import { Feather } from "@expo/vector-icons";
+import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { FIREBASE_APP } from "@/FirebaseConfig";
 import {
   createUserWithEmailAndPassword,
   getAuth,
   updateProfile,
 } from "firebase/auth";
+import IconTextInput from "../IconTextInput/IconTextInput";
+import { Button } from "react-native-paper";
+import { SIZES } from "@/constants/sizes";
 
 const SignUpForm = () => {
   const auth = getAuth(FIREBASE_APP);
@@ -54,8 +57,8 @@ const SignUpForm = () => {
 
         if (!values.password) {
           errors.password = "Password is required";
-        } else if (values.password.length <= 6) {
-          errors.password = "Password must be longer than 6 characters";
+        } else if (values.password.length < 6) {
+          errors.password = "Password must be at least 6 characters long";
         }
 
         if (
@@ -67,6 +70,8 @@ const SignUpForm = () => {
 
         return errors;
       }}
+      validateOnChange={false}
+      validateOnBlur={false}
       onSubmit={(values) =>
         handleSubmit(values.email, values.password, values.name)
       }
@@ -82,14 +87,19 @@ const SignUpForm = () => {
           }}
         >
           <View style={FormStyles.authTextInputContainer}>
-            <TextInput
-              onChangeText={handleChange("name")}
-              onBlur={handleBlur("name")}
-              value={values.name}
-              style={FormStyles.authTextInput}
-              placeholder="Name"
-              placeholderTextColor={Colors.black.text}
-              textContentType="name"
+            <IconTextInput
+              Icon={Feather}
+              iconProps={{ name: "user", size: 26, color: "black" }}
+              TextInput={TextInput}
+              textInputProps={{
+                onChangeText: handleChange("name"),
+                onBlur: handleBlur("name"),
+                value: values.name,
+                style: FormStyles.authTextInput,
+                placeholder: "Name",
+                placeholderTextColor: Colors.black.text,
+                textContentType: "name",
+              }}
             />
             {errors.name && (
               <Text
@@ -104,16 +114,21 @@ const SignUpForm = () => {
           </View>
 
           <View style={FormStyles.authTextInputContainer}>
-            <TextInput
-              onChangeText={handleChange("email")}
-              onBlur={handleBlur("email")}
-              value={values.email}
-              style={FormStyles.authTextInput}
-              placeholder="Email"
-              placeholderTextColor={Colors.black.text}
-              textContentType="emailAddress"
-              inputMode="email"
-              autoCorrect={false}
+            <IconTextInput
+              Icon={Feather}
+              iconProps={{ name: "mail", size: 26, color: "black" }}
+              TextInput={TextInput}
+              textInputProps={{
+                onChangeText: handleChange("email"),
+                onBlur: handleBlur("email"),
+                value: values.email,
+                style: FormStyles.authTextInput,
+                placeholder: "Email",
+                placeholderTextColor: Colors.black.text,
+                textContentType: "emailAddress",
+                inputMode: "email",
+                autoCorrect: false,
+              }}
             />
             {errors.email && (
               <Text
@@ -128,15 +143,20 @@ const SignUpForm = () => {
           </View>
 
           <View style={FormStyles.authTextInputContainer}>
-            <TextInput
-              onChangeText={handleChange("password")}
-              onBlur={handleBlur("password")}
-              value={values.password}
-              style={FormStyles.authTextInput}
-              placeholder="Password"
-              placeholderTextColor={Colors.black.text}
-              textContentType="password"
-              secureTextEntry
+            <IconTextInput
+              Icon={SimpleLineIcons}
+              iconProps={{ name: "lock", size: 26, color: "black" }}
+              TextInput={TextInput}
+              textInputProps={{
+                onChangeText: handleChange("password"),
+                onBlur: handleBlur("password"),
+                value: values.password,
+                style: FormStyles.authTextInput,
+                placeholder: "Password",
+                placeholderTextColor: Colors.black.text,
+                textContentType: "password",
+                secureTextEntry: true,
+              }}
             />
             {errors.password && (
               <Text
@@ -151,15 +171,20 @@ const SignUpForm = () => {
           </View>
 
           <View style={FormStyles.authTextInputContainer}>
-            <TextInput
-              onChangeText={handleChange("confirmPassword")}
-              onBlur={handleBlur("confirmPassword")}
-              value={values.confirmPassword}
-              style={FormStyles.authTextInput}
-              placeholder="Confirm Password"
-              placeholderTextColor={Colors.black.text}
-              textContentType="password"
-              secureTextEntry
+            <IconTextInput
+              Icon={SimpleLineIcons}
+              iconProps={{ name: "lock", size: 26, color: "black" }}
+              TextInput={TextInput}
+              textInputProps={{
+                onChangeText: handleChange("confirmPassword"),
+                onBlur: handleBlur("confirmPassword"),
+                value: values.confirmPassword,
+                style: FormStyles.authTextInput,
+                placeholder: "Confirm Password",
+                placeholderTextColor: Colors.black.text,
+                textContentType: "password",
+                secureTextEntry: true,
+              }}
             />
             {errors.confirmPassword && (
               <Text
@@ -173,7 +198,17 @@ const SignUpForm = () => {
             )}
           </View>
 
-          <Button onPress={handleSubmit} title="Submit" />
+          <Button
+            mode="elevated"
+            buttonColor={Colors.lightOrange.text}
+            textColor={Colors.black.text}
+            labelStyle={{ fontSize: SIZES.lg }}
+            style={{ borderRadius: 50, marginTop: 15 }}
+            contentStyle={{ paddingVertical: 10, paddingHorizontal: "15%" }}
+            onPress={() => handleSubmit()}
+          >
+            Sign Up
+          </Button>
         </View>
       )}
     </Formik>

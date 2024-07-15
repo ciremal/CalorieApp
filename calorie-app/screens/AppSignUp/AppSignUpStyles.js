@@ -19,7 +19,7 @@ export const AppSignUpStyles = StyleSheet.create({
     borderTopRightRadius: 50,
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
   },
 
   linearGradient: {

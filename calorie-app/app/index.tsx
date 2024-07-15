@@ -11,13 +11,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { LogBox } from "react-native";
 import { MealContextProvider } from "@/hooks/useMealContext";
 import FoodNutritionEditManual from "@/screens/FoodNutritionEditManual/FoodNutritionEditManual";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  User,
-} from "firebase/auth";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { FIREBASE_APP } from "@/FirebaseConfig";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
