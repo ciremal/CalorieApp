@@ -28,8 +28,13 @@ import { SIZES } from "@/constants/sizes";
 import { getTotalNutrient } from "@/helpers/getNutrientStats";
 import roundNumbers from "@/helpers/roundNumbers";
 import * as OpenAnything from "react-native-openanything";
+import { getAuth } from "firebase/auth";
 
 const MealsHome = () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  console.log(user?.displayName);
+
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);

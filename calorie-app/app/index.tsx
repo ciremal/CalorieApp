@@ -32,7 +32,6 @@ const Home = () => {
       setUser(user);
     });
   }, []);
-  console.log(user);
 
   return (
     <MealContextProvider>
