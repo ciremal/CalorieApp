@@ -17,8 +17,11 @@ import { ErrorAlert } from "@/components/Alerts/Alerts";
 import DeleteDialog from "@/components/DeleteDialog/DeleteDialog";
 import CreateFoodItemModal from "@/components/Modals/CreateFoodItemModal";
 import { MealContext } from "@/hooks/useMealContext";
+import { getAuth } from "firebase/auth";
 
 const MealSummary = () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
   const { selectedMeal } = useContext(MealContext);
 
   const navigation = useNavigation();
@@ -42,7 +45,7 @@ const MealSummary = () => {
     mutationFn: useDeleteMeal,
     onSuccess: async () => {
       await queryClient.refetchQueries({
-        queryKey: ["getMealsByDate", createdAt],
+        queryKey: ["getMealsByDateAndUser", createdAt, user?.uid],
         active: true,
       });
       navigation.navigate("Meal Home");

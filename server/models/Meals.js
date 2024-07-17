@@ -33,6 +33,10 @@ const mealSchema = mongoose.Schema({
     type: String,
     default: getDate(),
   },
+  user: {
+    type: String,
+    default: "",
+  },
 });
 
 export const MealModel = mongoose.model("Meal", mealSchema, "Meals");

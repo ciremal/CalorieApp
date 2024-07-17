@@ -11,10 +11,13 @@ export const useGetMeals = () => {
   });
 };
 
-export const useGetMealsByDate = (date) => {
-  return useQuery(["getMealsByDate", date], async () => {
+export const useGetMealsByDateAndUser = (date, user) => {
+  return useQuery(["getMealsByDateAndUser", date, user], async () => {
     return await axios
-      .post(`http://${backendIp}:5000/meals/getMealsByDate`, { date })
+      .post(`http://${backendIp}:5000/meals/getMealsByDateAndUser`, {
+        date,
+        user,
+      })
       .then((res) => {
         const { data } = res.data;
         return data;
@@ -39,11 +42,12 @@ export const useGetMealById = (id) => {
   });
 };
 
-export const useCreateMeal = async ({ title, createdAt }) => {
+export const useCreateMeal = async ({ title, user, createdAt }) => {
   return axios
     .post(`http://${backendIp}:5000/meals/createMeal`, {
       title,
       createdAt,
+      user,
     })
     .then((res) => {
       const { data } = res.data;

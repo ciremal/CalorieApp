@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import { Formik } from "formik";
 import { FormStyles } from "./FormStyles";
@@ -13,18 +13,34 @@ import {
 import IconTextInput from "../IconTextInput/IconTextInput";
 import { Button } from "react-native-paper";
 import { SIZES } from "@/constants/sizes";
+import { useMutation } from "react-query";
+import { useCreateUser } from "@/api/user";
 
 const SignUpForm = () => {
   const auth = getAuth(FIREBASE_APP);
+
+  const [loading, setLoading] = useState(false);
+
+  const { mutate } = useMutation({
+    mutationFn: useCreateUser,
+    onSuccess: () => {
+      console.log("User successfully added to mongoDB");
+    },
+    onError: (error: any) => {
+      console.error(error.message);
+    },
+  });
 
   const handleSubmit = async (
     email: string,
     password: string,
     name: string
   ) => {
+    setLoading(true);
     createUserWithEmailAndPassword(auth, email, password)
       .then(({ user }) => {
         updateProfile(user, { displayName: name });
+        mutate({ user: { email: email, name: name }, uid: user.uid });
       })
       .catch((error) => {
         console.error(error.code);
@@ -32,6 +48,7 @@ const SignUpForm = () => {
       })
       .finally(() => {
         console.log("User Created Successfully");
+        setLoading(false);
       });
   };
 
@@ -206,6 +223,7 @@ const SignUpForm = () => {
             style={{ borderRadius: 50, marginTop: 15 }}
             contentStyle={{ paddingVertical: 10, paddingHorizontal: "15%" }}
             onPress={() => handleSubmit()}
+            loading={loading}
           >
             Sign Up
           </Button>

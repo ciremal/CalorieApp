@@ -16,7 +16,7 @@ import { Divider, ActivityIndicator } from "react-native-paper";
 import { Colors } from "@/constants/Colors";
 import { useState } from "react";
 import Totals from "../../components/Totals/Totals";
-import { useCreateMeal, useGetMealsByDate } from "../../api/meals";
+import { useCreateMeal, useGetMealsByDateAndUser } from "../../api/meals";
 import { useMutation } from "react-query";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
 import { Feather, Entypo } from "@expo/vector-icons";
@@ -33,7 +33,6 @@ import { getAuth } from "firebase/auth";
 const MealsHome = () => {
   const auth = getAuth();
   const user = auth.currentUser;
-  console.log(user?.displayName);
 
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
@@ -51,7 +50,7 @@ const MealsHome = () => {
     isFetching,
     error,
     refetch,
-  } = useGetMealsByDate(selectedDate);
+  } = useGetMealsByDateAndUser(selectedDate, user?.uid);
 
   const totalCals = getTotalNutrient("cals", meals);
 
@@ -67,7 +66,7 @@ const MealsHome = () => {
   });
 
   const addMeal = async (title: string): Promise<void> => {
-    mutate({ title: title, createdAt: selectedDate });
+    mutate({ title: title, user: user?.uid, createdAt: selectedDate });
   };
 
   const handleDateSelection = (day: any) => {
@@ -154,7 +153,7 @@ const MealsHome = () => {
           {isFetching && !meals && (
             <ActivityIndicator animating={true} color={Colors.orange.text} />
           )}
-          {meals && (
+          {meals && user && (
             <>
               <Totals meals={meals} />
               {meals.map((meal: any) => (
