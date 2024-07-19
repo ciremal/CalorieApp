@@ -1,5 +1,4 @@
 import { Router } from "express";
-import roundNumbers from "../helpers/roundNumbers.js";
 import { UserModel } from "../models/User.js";
 
 const router = Router();
@@ -8,7 +7,6 @@ router.post("/getUserById", async (req, res) => {
   try {
     const { id } = req.body;
     const user = await UserModel.findById(id);
-    console.log(user);
 
     res.status(201).json({
       success: true,

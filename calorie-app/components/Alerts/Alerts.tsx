@@ -1,9 +1,10 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { alertsStyles } from "./AlertsStyles.js";
 import {
   Entypo,
   MaterialCommunityIcons,
   FontAwesome6,
+  AntDesign,
 } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 
@@ -35,5 +36,21 @@ export const SomethingWentWrong = (props: { message: String }) => {
       <FontAwesome6 name="sad-tear" size={125} color="black" />
       <Text style={alertsStyles.emptySearchMessage}>{props.message}</Text>
     </View>
+  );
+};
+
+export const CompleteProfile = (props: {
+  message: String;
+  handlePress: () => void;
+}) => {
+  return (
+    <TouchableOpacity
+      onPress={props.handlePress}
+      activeOpacity={0.6}
+      style={alertsStyles.emptySearchContainer}
+    >
+      <AntDesign name="form" size={125} color={Colors.orange.text} />
+      <Text style={alertsStyles.completeProfileMessage}>{props.message}</Text>
+    </TouchableOpacity>
   );
 };

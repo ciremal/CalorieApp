@@ -36,4 +36,10 @@ export const alertsStyles = StyleSheet.create({
     textAlign: "center",
     color: Colors.black.text,
   },
+  completeProfileMessage: {
+    fontSize: SIZES.xl2,
+    color: Colors.black.text,
+    textAlign: "center",
+    paddingHorizontal: 10,
+  },
 });

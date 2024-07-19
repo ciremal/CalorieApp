@@ -40,6 +40,14 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    gender: {
+      type: String,
+      default: "",
+    },
+    profileComplete: {
+      type: Boolean,
+      default: false,
+    },
   },
   { _id: false }
 );

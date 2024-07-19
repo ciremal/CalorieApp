@@ -18,7 +18,7 @@ import { useState } from "react";
 import Totals from "../../components/Totals/Totals";
 import { useCreateMeal, useGetMealsByDateAndUser } from "../../api/meals";
 import { useMutation } from "react-query";
-import { ErrorAlert } from "@/components/Alerts/Alerts";
+import { CompleteProfile, ErrorAlert } from "@/components/Alerts/Alerts";
 import { Feather, Entypo } from "@expo/vector-icons";
 import { dateToday, dateYesterday } from "@/helpers/dates";
 import CalendarModal from "@/components/Modals/CalendarModal";
@@ -29,10 +29,13 @@ import { getTotalNutrient } from "@/helpers/getNutrientStats";
 import roundNumbers from "@/helpers/roundNumbers";
 import * as OpenAnything from "react-native-openanything";
 import { getAuth } from "firebase/auth";
+import { useGetUserById } from "@/api/user";
+import { useNavigation } from "@react-navigation/native";
 
 const MealsHome = () => {
   const auth = getAuth();
   const user = auth.currentUser;
+  const navigation = useNavigation();
 
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
@@ -51,6 +54,12 @@ const MealsHome = () => {
     error,
     refetch,
   } = useGetMealsByDateAndUser(selectedDate, user?.uid);
+
+  const {
+    data: userData,
+    isFetching: isFetchingUserData,
+    error: errorUserData,
+  } = useGetUserById(user?.uid);
 
   const totalCals = getTotalNutrient("cals", meals);
 
@@ -114,6 +123,10 @@ const MealsHome = () => {
     }
   };
 
+  const navigateToCompleteForm = () => {
+    navigation.navigate("Profile");
+  };
+
   return (
     <SafeAreaView style={styles.body}>
       <Divider style={styles.divider} />
@@ -145,151 +158,173 @@ const MealsHome = () => {
       />
       <ScrollView>
         <View style={pageStyles.container}>
-          {error && (
+          {error && errorUserData && (
             <ErrorAlert
               message={"Could not load meals. Please try again later"}
             />
           )}
-          {isFetching && !meals && (
+          {isFetching && !meals && isFetchingUserData && !userData && (
             <ActivityIndicator animating={true} color={Colors.orange.text} />
           )}
-          {meals && user && (
+          {meals && user && userData && (
             <>
-              <Totals meals={meals} />
-              {meals.map((meal: any) => (
-                <MealBox meal={meal} key={meal.title} />
-              ))}
+              {userData.profileComplete ? (
+                <>
+                  <Totals meals={meals} />
+                  {meals.map((meal: any) => (
+                    <MealBox meal={meal} key={meal.title} />
+                  ))}
 
-              {totalCals > 0 && (
-                <View style={{ marginVertical: "10%", width: "90%" }}>
-                  <View style={{ marginVertical: 15, rowGap: 6 }}>
-                    <Text style={{ fontSize: SIZES.lg, fontWeight: "600" }}>
-                      Summary
-                    </Text>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={{ fontSize: SIZES.md }}>
-                        Calories Remaining
-                      </Text>
-                      <Text style={{ fontSize: SIZES.md }}>
-                        {totalCals >= 2000 ? 0 : roundNumbers(2000 - totalCals)}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={{ fontSize: SIZES.md }}>
-                        Calories Consumed
-                      </Text>
-                      <Text style={{ fontSize: SIZES.md, fontWeight: "600" }}>
-                        {totalCals}
-                      </Text>
-                    </View>
-                    <Divider style={{ backgroundColor: "black", height: 1 }} />
-                    <Text
-                      style={{
-                        fontSize: SIZES.md,
-                        textAlign: "right",
-                        fontStyle: "italic",
-                      }}
-                    >
-                      2000
-                    </Text>
-                  </View>
-
-                  <MealHomeSummary meals={meals} />
-
-                  <View style={{ marginTop: 10, rowGap: 6 }}>
-                    <Text style={{ fontSize: SIZES.lg, fontWeight: "600" }}>
-                      Daily Recommended Intakes
-                    </Text>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={{ fontSize: SIZES.md }}>Fats:</Text>
-                      <Text style={{ fontSize: SIZES.md }}>
-                        {`${getDRI("fats", 65, 1.6764, "male", 21)} grams`}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={{ fontSize: SIZES.md }}>Carbs:</Text>
-                      <Text style={{ fontSize: SIZES.md }}>
-                        {`${getDRI("carbs", 65, 1.6764, "male", 21)} grams`}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={{ fontSize: SIZES.md }}>Proteins:</Text>
-                      <Text style={{ fontSize: SIZES.md }}>
-                        {`${getDRI("proteins", 65, 1.6764, "male", 21)} grams`}
-                      </Text>
-                    </View>
-
-                    <View style={{ marginTop: 10, rowGap: 6 }}>
-                      <Text
-                        style={{
-                          fontSize: SIZES.md,
-                          fontStyle: "italic",
-                        }}
-                      >
-                        These ranges are calculated based on DRI Reference
-                        Values for Macronutrients. You can find the information{" "}
-                        <Text
-                          onPress={() =>
-                            OpenAnything.Pdf(
-                              "https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf"
-                            )
-                          }
+                  {totalCals > 0 && (
+                    <View style={{ marginVertical: "10%", width: "90%" }}>
+                      <View style={{ marginVertical: 15, rowGap: 6 }}>
+                        <Text style={{ fontSize: SIZES.lg, fontWeight: "600" }}>
+                          Summary
+                        </Text>
+                        <View
                           style={{
-                            color: "blue",
-                            textDecorationLine: "underline",
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
                           }}
                         >
-                          here
+                          <Text style={{ fontSize: SIZES.md }}>
+                            Calories Remaining
+                          </Text>
+                          <Text style={{ fontSize: SIZES.md }}>
+                            {totalCals >= 2000
+                              ? 0
+                              : roundNumbers(2000 - totalCals)}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Text style={{ fontSize: SIZES.md }}>
+                            Calories Consumed
+                          </Text>
+                          <Text
+                            style={{ fontSize: SIZES.md, fontWeight: "600" }}
+                          >
+                            {totalCals}
+                          </Text>
+                        </View>
+                        <Divider
+                          style={{ backgroundColor: "black", height: 1 }}
+                        />
+                        <Text
+                          style={{
+                            fontSize: SIZES.md,
+                            textAlign: "right",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          2000
                         </Text>
-                      </Text>
+                      </View>
+
+                      <MealHomeSummary meals={meals} />
+
+                      <View style={{ marginTop: 10, rowGap: 6 }}>
+                        <Text style={{ fontSize: SIZES.lg, fontWeight: "600" }}>
+                          Daily Recommended Intakes
+                        </Text>
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Text style={{ fontSize: SIZES.md }}>Fats:</Text>
+                          <Text style={{ fontSize: SIZES.md }}>
+                            {`${getDRI("fats", 65, 1.6764, "male", 21)} grams`}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Text style={{ fontSize: SIZES.md }}>Carbs:</Text>
+                          <Text style={{ fontSize: SIZES.md }}>
+                            {`${getDRI("carbs", 65, 1.6764, "male", 21)} grams`}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Text style={{ fontSize: SIZES.md }}>Proteins:</Text>
+                          <Text style={{ fontSize: SIZES.md }}>
+                            {`${getDRI(
+                              "proteins",
+                              65,
+                              1.6764,
+                              "male",
+                              21
+                            )} grams`}
+                          </Text>
+                        </View>
+
+                        <View style={{ marginTop: 10, rowGap: 6 }}>
+                          <Text
+                            style={{
+                              fontSize: SIZES.md,
+                              fontStyle: "italic",
+                            }}
+                          >
+                            These ranges are calculated based on DRI Reference
+                            Values for Macronutrients. You can find the
+                            information{" "}
+                            <Text
+                              onPress={() =>
+                                OpenAnything.Pdf(
+                                  "https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf"
+                                )
+                              }
+                              style={{
+                                color: "blue",
+                                textDecorationLine: "underline",
+                              }}
+                            >
+                              here
+                            </Text>
+                          </Text>
+                        </View>
+                      </View>
                     </View>
-                  </View>
-                </View>
+                  )}
+
+                  <CreateMealModal
+                    visible={visible}
+                    hideModal={hideModal}
+                    onSubmit={addMeal}
+                  />
+
+                  <CalendarModal
+                    calendarVisible={calendarVisible}
+                    hideCalendar={hideCalendar}
+                    handleDateSelection={handleDateSelection}
+                    currentDate={currentDate}
+                    selectedDate={selectedDate}
+                  />
+                </>
+              ) : (
+                <CompleteProfile
+                  message={"Complete your profile to get started"}
+                  handlePress={navigateToCompleteForm}
+                />
               )}
-
-              <CreateMealModal
-                visible={visible}
-                hideModal={hideModal}
-                onSubmit={addMeal}
-              />
-
-              <CalendarModal
-                calendarVisible={calendarVisible}
-                hideCalendar={hideCalendar}
-                handleDateSelection={handleDateSelection}
-                currentDate={currentDate}
-                selectedDate={selectedDate}
-              />
             </>
           )}
         </View>
