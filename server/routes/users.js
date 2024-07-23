@@ -43,16 +43,30 @@ router.post("/createUser", async (req, res) => {
 
 router.post("/updateUser", async (req, res) => {
   try {
-    const { id, name, height, weight, weightGoal, calorieGoal, PA } = req.body;
+    const { id, user } = req.body;
+    const {
+      name,
+      gender,
+      DOB,
+      height,
+      weight,
+      weightGoal,
+      calorieGoal,
+      PA,
+      profileComplete,
+    } = user;
     const updatedUser = await UserModel.updateOne(
       { _id: id },
       {
         name: name,
+        gender: gender,
+        DOB: DOB,
         height: height,
         weight: weight,
         weightGoal: weightGoal,
         calorieGoal: calorieGoal,
         PA: PA,
+        profileComplete: profileComplete,
       }
     );
 

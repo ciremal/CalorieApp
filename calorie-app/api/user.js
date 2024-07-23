@@ -32,24 +32,11 @@ export const useCreateUser = async ({ user, uid }) => {
     });
 };
 
-export const useUpdateUser = async ({
-  id,
-  name,
-  height,
-  weight,
-  weightGoal,
-  calorieGoal,
-  PA,
-}) => {
+export const useUpdateUser = async ({ id, user }) => {
   return axios
     .post(`http://${backendIp}:5000/users/updateUser`, {
       id,
-      name,
-      height,
-      weight,
-      weightGoal,
-      calorieGoal,
-      PA,
+      user,
     })
     .then((res) => {
       const { data } = res.data;

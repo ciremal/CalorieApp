@@ -25,7 +25,6 @@ router.get("/getMeals", async (req, res) => {
 
 router.post("/getMealsByDateAndUser", async (req, res) => {
   const { date, user } = req.body;
-  console.log(user);
   await MealModel.find({ createdAt: date, user: user })
     .then(function (meal) {
       res.status(201).json({

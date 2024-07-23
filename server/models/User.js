@@ -44,6 +44,10 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    DOB: {
+      type: String,
+      default: "",
+    },
     profileComplete: {
       type: Boolean,
       default: false,

@@ -26,6 +26,9 @@ export const FormStyles = StyleSheet.create({
     color: Colors.lightOrange.text,
     width: "100%",
   },
+  textInputLabel: {
+    fontSize: 18,
+  },
   textInputDropdown: {
     borderRadius: 0,
   },
@@ -55,5 +58,8 @@ export const FormStyles = StyleSheet.create({
   authTextInputContainer: {
     width: "100%",
     rowGap: 5,
+  },
+  textGroupHeader: {
+    fontSize: SIZES.xl,
   },
 });
