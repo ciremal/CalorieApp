@@ -5,11 +5,10 @@ import { SIZES } from "@/constants/sizes";
 export const ProfileStyles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
   },
   headerContainer: {
     width: "100%",
-    height: "25%",
+    height: 160,
     shadowOpacity: 0.6,
     shadowOffset: { height: 1 },
     shadowRadius: 8,
@@ -34,18 +33,11 @@ export const ProfileStyles = StyleSheet.create({
     zIndex: 100,
   },
 
-  dividerTop: {
-    width: "100%",
-    borderColor: Colors.orange.text,
-    borderWidth: 0.5,
-    marginTop: "5%",
-  },
-
-  dividerBottom: {
-    width: "100%",
-    borderColor: Colors.orange.text,
-    borderWidth: 0.5,
-    marginBottom: "5%",
+  bodyContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: "10%",
   },
 
   infoTitle: {
@@ -53,9 +45,8 @@ export const ProfileStyles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  personalInfoContainer: {
+  infoContainer: {
     width: "90%",
-    display: "flex",
     paddingHorizontal: "10%",
     paddingVertical: "5%",
     rowGap: "10%",
@@ -67,6 +58,7 @@ export const ProfileStyles = StyleSheet.create({
     shadowColor: Colors.black.text,
     backgroundColor: Colors.lightWhite.text,
   },
+
   personalInfoTitleContainer: {
     marginBottom: "5%",
   },
@@ -80,19 +72,6 @@ export const ProfileStyles = StyleSheet.create({
     fontSize: SIZES.md,
   },
 
-  myWeightContainer: {
-    width: "90%",
-    paddingHorizontal: "10%",
-    paddingVertical: "10%",
-    rowGap: "10%",
-    borderRadius: 12,
-    borderStyle: "solid",
-    shadowOpacity: 0.5,
-    shadowOffset: { height: 0.5 },
-    shadowRadius: 2,
-    shadowColor: Colors.black.text,
-    backgroundColor: Colors.lightWhite.text,
-  },
   myWeightProgressBarContainer: {
     width: "100%",
     rowGap: 5,
@@ -105,5 +84,13 @@ export const ProfileStyles = StyleSheet.create({
   },
   myWeightProgressBarNumbers: {
     fontSize: SIZES.md,
+  },
+
+  calorieRecommendationsText: {
+    fontSize: SIZES.md,
+  },
+  calorieRecommednationsInfoText: {
+    fontSize: SIZES.sm,
+    fontStyle: "italic",
   },
 });

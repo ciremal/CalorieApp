@@ -8,10 +8,25 @@ router.post("/getUserById", async (req, res) => {
     const { id } = req.body;
     const user = await UserModel.findById(id);
 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Convert Decimal128 to usable decimal values
+    const userData = user.toObject();
+    userData.height = parseFloat(userData.height.toString());
+    userData.currentWeight = parseFloat(userData.currentWeight.toString());
+    userData.startWeight = parseFloat(userData.startWeight.toString());
+    userData.weightGoal = parseFloat(userData.weightGoal.toString());
+    userData.calorieGoal = parseFloat(userData.calorieGoal.toString());
+
     res.status(201).json({
       success: true,
       message: "User found",
-      data: user,
+      data: userData,
     });
   } catch (error) {
     res.status(500).json({
@@ -49,7 +64,8 @@ router.post("/updateUser", async (req, res) => {
       gender,
       DOB,
       height,
-      weight,
+      startWeight,
+      currentWeight,
       weightGoal,
       calorieGoal,
       PA,
@@ -62,7 +78,8 @@ router.post("/updateUser", async (req, res) => {
         gender: gender,
         DOB: DOB,
         height: height,
-        weight: weight,
+        startWeight: startWeight,
+        currentWeight: currentWeight,
         weightGoal: weightGoal,
         calorieGoal: calorieGoal,
         PA: PA,

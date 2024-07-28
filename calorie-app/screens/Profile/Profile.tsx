@@ -8,12 +8,20 @@ import { useState } from "react";
 import { getAuth } from "firebase/auth";
 import { useGetUserById } from "@/api/user";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
-import { ActivityIndicator, Divider } from "react-native-paper";
+import { ActivityIndicator } from "react-native-paper";
 import { SIZES } from "@/constants/sizes";
 import { Stack } from "expo-router";
 import { Bar } from "react-native-progress";
 import { getAge } from "@/helpers/dates";
 import { ScrollView } from "react-native";
+import {
+  formatAMDR,
+  getAMDRCarbs,
+  getAMDRFat,
+  getEER,
+  getRDAProtein,
+} from "@/helpers/nutrientsHelpers";
+import roundNumbers from "@/helpers/roundNumbers";
 
 const Profile = () => {
   const auth = getAuth();
@@ -32,6 +40,17 @@ const Profile = () => {
     setWidth(width);
   };
 
+  const calculateWeightProgress = (
+    startWeight: number,
+    currentWeight: number,
+    weightGoal: number
+  ) => {
+    const num = startWeight - currentWeight;
+    const den = startWeight - weightGoal;
+
+    return roundNumbers(num / den);
+  };
+
   return (
     <View style={ProfileStyles.container}>
       <Stack.Screen
@@ -48,22 +67,22 @@ const Profile = () => {
         <ActivityIndicator animating={true} color={Colors.orange.text} />
       )}
       {data && (
-        <ScrollView style={{ width: "100%" }}>
-          <View
-            style={[
-              ProfileStyles.avatarContainer,
-              {
-                height: avatarSize,
-                width: avatarSize,
-                top: height - avatarSize / 2,
-                left: width / 2 - avatarSize / 2,
-              },
-            ]}
-          >
-            <EvilIcons name="user" size={avatarSize} color="black" />
-          </View>
+        <ScrollView>
+          <View style={ProfileStyles.bodyContainer}>
+            <View
+              style={[
+                ProfileStyles.avatarContainer,
+                {
+                  height: avatarSize,
+                  width: avatarSize,
+                  top: height - avatarSize / 2,
+                  left: width / 2 - avatarSize / 2,
+                },
+              ]}
+            >
+              <EvilIcons name="user" size={avatarSize} color="black" />
+            </View>
 
-          <View style={{ width: "100%" }}>
             <View style={ProfileStyles.headerContainer}>
               <LinearGradient
                 onLayout={onLayout}
@@ -73,7 +92,6 @@ const Profile = () => {
                 style={ProfileStyles.linearGradientContainer}
               ></LinearGradient>
             </View>
-
             <View
               style={{
                 width: "100%",
@@ -113,7 +131,7 @@ const Profile = () => {
                     marginTop: "7%",
                   }}
                 >
-                  <TouchableOpacity style={ProfileStyles.personalInfoContainer}>
+                  <TouchableOpacity style={ProfileStyles.infoContainer}>
                     <View style={ProfileStyles.personalInfoTitleContainer}>
                       <Text style={ProfileStyles.infoTitle}>
                         Personal Information
@@ -145,11 +163,22 @@ const Profile = () => {
                     </View>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={ProfileStyles.myWeightContainer}>
+                  <TouchableOpacity
+                    style={ProfileStyles.infoContainer}
+                    onPress={() =>
+                      navigation.navigate("Weight Manager", {
+                        user: data,
+                      })
+                    }
+                  >
                     <Text style={ProfileStyles.infoTitle}>My Weight</Text>
                     <View style={ProfileStyles.myWeightProgressBarContainer}>
                       <Bar
-                        progress={0.3}
+                        progress={calculateWeightProgress(
+                          data.startWeight,
+                          data.currentWeight,
+                          data.weightGoal
+                        )}
                         width={null}
                         style={{ width: "100%" }}
                         height={10}
@@ -161,7 +190,7 @@ const Profile = () => {
                         }
                       >
                         <Text style={ProfileStyles.myWeightProgressBarNumbers}>
-                          {data.weight}kg
+                          {data.startWeight}kg
                         </Text>
                         <Text
                           style={[
@@ -169,7 +198,7 @@ const Profile = () => {
                             { fontWeight: "700" },
                           ]}
                         >
-                          {data.weight}kg
+                          {data.currentWeight}kg
                         </Text>
                         <Text style={ProfileStyles.myWeightProgressBarNumbers}>
                           {data.weightGoal}kg
@@ -177,6 +206,57 @@ const Profile = () => {
                       </View>
                     </View>
                   </TouchableOpacity>
+
+                  <View style={ProfileStyles.infoContainer}>
+                    <Text style={ProfileStyles.infoTitle}>
+                      Calorie Goal: {data.calorieGoal}
+                    </Text>
+                    <Text style={ProfileStyles.calorieRecommendationsText}>
+                      Estimated Calorie Requirement:{" "}
+                      {getEER(
+                        getAge(data.DOB),
+                        data.gender,
+                        data.PA,
+                        data.currentWeight,
+                        data.height
+                      )}
+                    </Text>
+                    <Text style={ProfileStyles.calorieRecommendationsText}>
+                      Recommended Carbs Intake:{" "}
+                      {formatAMDR(
+                        getAMDRCarbs(
+                          getAge(data.DOB),
+                          data.gender,
+                          data.PA,
+                          data.currentWeight,
+                          data.height
+                        )
+                      )}
+                      g
+                    </Text>
+                    <Text style={ProfileStyles.calorieRecommendationsText}>
+                      Recommended Protein Intake:{" "}
+                      {getRDAProtein(data.currentWeight, getAge(data.DOB))}g
+                    </Text>
+                    <Text style={ProfileStyles.calorieRecommendationsText}>
+                      Recommended Fat Intake:{" "}
+                      {formatAMDR(
+                        getAMDRFat(
+                          getAge(data.DOB),
+                          data.gender,
+                          data.PA,
+                          data.currentWeight,
+                          data.height
+                        )
+                      )}
+                      g
+                    </Text>
+                    <Text style={ProfileStyles.calorieRecommednationsInfoText}>
+                      This information is calculated based on several factors
+                      including your height, gender, age, physical activity, and
+                      current weight
+                    </Text>
+                  </View>
                 </View>
               ) : (
                 <View style={{ flex: 1, marginTop: "25%" }}>

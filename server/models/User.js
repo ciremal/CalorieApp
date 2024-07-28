@@ -21,19 +21,27 @@ const userSchema = mongoose.Schema(
       default: getDate(),
     },
     height: {
-      type: Number,
+      type: mongoose.Types.Decimal128,
       default: 0,
     },
-    weight: {
-      type: Number,
+    startWeight: {
+      type: mongoose.Types.Decimal128,
+      default: 0,
+    },
+    currentWeight: {
+      type: mongoose.Types.Decimal128,
       default: 0,
     },
     weightGoal: {
-      type: Number,
+      type: mongoose.Types.Decimal128,
       default: 0,
     },
+    weightHistory: {
+      type: [Object],
+      default: [],
+    },
     calorieGoal: {
-      type: Number,
+      type: mongoose.Types.Decimal128,
       default: 0,
     },
     PA: {

@@ -4,7 +4,7 @@ import styles from "@/styles/general";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { Button, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 
 const CompleteProfile = () => {
   const router = useRoute();
