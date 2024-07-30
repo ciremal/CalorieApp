@@ -14,7 +14,7 @@ import { SIZES } from "@/constants/sizes";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { formatDate } from "@/helpers/dates";
+import { dateToday, formatDate } from "@/helpers/dates";
 import { useMutation, useQueryClient } from "react-query";
 import { useUpdateUser } from "@/api/user";
 import { useNavigation } from "expo-router";
@@ -64,6 +64,7 @@ const CompleteProfileForm = ({
       height: values.height,
       startWeight: values.weight,
       currentWeight: values.weight,
+      weightHistory: [{ weight: values.weight, date: dateToday }],
       PA: values.PA,
       calorieGoal: values.calGoal,
       weightGoal: values.weightGoal,
