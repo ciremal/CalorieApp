@@ -71,6 +71,21 @@ export const useUpdateUserWeight = async ({
     });
 };
 
+export const useUpdateCalorieGoal = async ({ id, calorieGoal }) => {
+  return axios
+    .post(`http://${backendIp}:5000/users/updateCalorieGoal`, {
+      id,
+      calorieGoal,
+    })
+    .then((res) => {
+      const { data } = res.data;
+      return data;
+    })
+    .catch((err) => {
+      throw err.response.data;
+    });
+};
+
 // BOILDERPLATE API Call GET
 // export const name = () => {
 //   return useQuery(["name"], async () => {

@@ -133,4 +133,27 @@ router.post("/updateWeight", async (req, res) => {
   }
 });
 
+router.post("/updateCalorieGoal", async (req, res) => {
+  try {
+    const { id, calorieGoal } = req.body;
+    const updatedUser = await UserModel.updateOne(
+      { _id: id },
+      {
+        calorieGoal: calorieGoal,
+      }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error,
+    });
+  }
+});
+
 export default router;

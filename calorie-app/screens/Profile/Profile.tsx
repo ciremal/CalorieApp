@@ -6,7 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { EvilIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { getAuth } from "firebase/auth";
-import { useGetUserById } from "@/api/user";
+import { useGetUserById, useUpdateCalorieGoal } from "@/api/user";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
 import { ActivityIndicator } from "react-native-paper";
 import { SIZES } from "@/constants/sizes";
@@ -22,6 +22,8 @@ import {
   getRDAProtein,
 } from "@/helpers/nutrientsHelpers";
 import roundNumbers from "@/helpers/roundNumbers";
+import CalorieGoalModal from "@/components/Modals/CalorieGoalModal";
+import { useMutation, useQueryClient } from "react-query";
 
 const Profile = () => {
   const auth = getAuth();
@@ -34,11 +36,32 @@ const Profile = () => {
   const [height, setHeight] = useState(0);
   const [width, setWidth] = useState(0);
 
+  const [visible, setVisible] = useState(false);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const [loading, setLoading] = useState(false);
+
   const onLayout = (event: any) => {
     const { height, width } = event.nativeEvent.layout;
     setHeight(height);
     setWidth(width);
   };
+
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: useUpdateCalorieGoal,
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: ["getUserById", auth.currentUser?.uid],
+        active: true,
+      });
+      setLoading(false);
+      hideModal();
+    },
+    onError: (error: any) => {
+      console.error(error.message);
+    },
+  });
 
   const calculateWeightProgress = (
     startWeight: number,
@@ -49,6 +72,12 @@ const Profile = () => {
     const den = startWeight - weightGoal;
 
     return roundNumbers(num / den);
+  };
+
+  const updateCalorieGoal = (calorieGoal: number) => {
+    const id = data._id;
+    setLoading(true);
+    mutate({ id, calorieGoal });
   };
 
   return (
@@ -131,7 +160,12 @@ const Profile = () => {
                     marginTop: "7%",
                   }}
                 >
-                  <TouchableOpacity style={ProfileStyles.infoContainer}>
+                  <TouchableOpacity
+                    style={ProfileStyles.infoContainer}
+                    onPress={() =>
+                      navigation.navigate("Edit Profile", { userInfo: data })
+                    }
+                  >
                     <View style={ProfileStyles.personalInfoTitleContainer}>
                       <Text style={ProfileStyles.infoTitle}>
                         Personal Information
@@ -207,7 +241,10 @@ const Profile = () => {
                     </View>
                   </TouchableOpacity>
 
-                  <View style={ProfileStyles.infoContainer}>
+                  <TouchableOpacity
+                    style={ProfileStyles.infoContainer}
+                    onPress={showModal}
+                  >
                     <Text style={ProfileStyles.infoTitle}>
                       Calorie Goal: {data.calorieGoal}
                     </Text>
@@ -256,7 +293,14 @@ const Profile = () => {
                       including your height, gender, age, physical activity, and
                       current weight
                     </Text>
-                  </View>
+                  </TouchableOpacity>
+
+                  <CalorieGoalModal
+                    visible={visible}
+                    hideModal={hideModal}
+                    onSubmit={updateCalorieGoal}
+                    loading={loading}
+                  />
                 </View>
               ) : (
                 <View style={{ flex: 1, marginTop: "25%" }}>
