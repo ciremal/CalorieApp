@@ -102,4 +102,35 @@ router.post("/updateUser", async (req, res) => {
   }
 });
 
+router.post("/updateWeight", async (req, res) => {
+  try {
+    const { id, weightGoal, startWeight, currentWeight, weightLog } = req.body;
+    const user = await UserModel.findById(id);
+    if (weightLog) {
+      user.weightHistory.push(weightLog);
+    }
+
+    const updatedUser = await UserModel.updateOne(
+      { _id: id },
+      {
+        weightGoal: weightGoal,
+        startWeight: startWeight,
+        currentWeight: currentWeight,
+        weightHistory: user.weightHistory,
+      }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error,
+    });
+  }
+});
+
 export default router;

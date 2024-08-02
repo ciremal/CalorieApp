@@ -1,6 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import styles from "@/styles/general";
-import { Ionicons, AntDesign } from "@expo/vector-icons";
+import { Ionicons, AntDesign, Fontisto } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import {
@@ -15,17 +15,71 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { weightManagementStyles as pageStyles } from "./WeightManagementStyles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SIZES } from "@/constants/sizes";
-import roundNumbers from "@/helpers/roundNumbers";
+import { useMutation, useQueryClient } from "react-query";
+import { useUpdateUserWeight } from "@/api/user";
+import { dateToday } from "@/helpers/dates";
 
 const WeightManagement = () => {
   const router = useRoute();
   const navigation = useNavigation();
   const { user } = router.params;
-  console.log(user);
 
-  const [placeholder, setPlaceHolder] = useState(user.currentWeight.toString());
+  const [currentWeightPH, setCurrentWeightPH] = useState(
+    user.currentWeight.toString()
+  );
+  const [startWeightPH, setStartWeightPH] = useState(
+    user.startWeight.toString()
+  );
+  const [weightGoalPH, setWeightGoalPH] = useState(user.weightGoal.toString());
+
+  const [currentWeight, setCurrentWeight] = useState(user.currentWeight);
+  const [startWeight, setStartWeight] = useState(user.startWeight);
+  const [weightGoal, setWeightGoal] = useState(user.weightGoal);
+
+  const [enableSave, setEnableSave] = useState(false);
+
+  useEffect(() => {
+    if (
+      currentWeight !== user.currentWeight ||
+      startWeight !== user.startWeight ||
+      weightGoal !== user.weightGoal
+    ) {
+      setEnableSave(true);
+    } else {
+      setEnableSave(false);
+    }
+  }, [currentWeight, startWeight, weightGoal]);
+
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: useUpdateUserWeight,
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: ["getUserById", user._id],
+        active: true,
+      });
+      navigation.navigate("Profile Home");
+    },
+    onError: (error: any) => {
+      console.error(error.message);
+    },
+  });
+
+  const handleSaveChanges = () => {
+    const id = user._id;
+    const weightLog = {
+      weight: currentWeight,
+      date: dateToday,
+    };
+
+    if (currentWeight !== user.currentWeight) {
+      mutate({ id, currentWeight, startWeight, weightGoal, weightLog });
+    } else {
+      mutate({ id, currentWeight, startWeight, weightGoal });
+    }
+  };
 
   const renderWeightHistoryItem = (item: any) => {
     return (
@@ -36,6 +90,7 @@ const WeightManagement = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
+          marginBottom: "2%",
         }}
       >
         <Text style={{ fontSize: SIZES.lg }}>{item.weight}kg</Text>
@@ -64,50 +119,43 @@ const WeightManagement = () => {
                 </TouchableOpacity>
               );
             },
+            headerRight: () => {
+              return (
+                <TouchableOpacity
+                  disabled={!enableSave}
+                  onPress={handleSaveChanges}
+                >
+                  <Fontisto
+                    name="save"
+                    size={24}
+                    color={
+                      enableSave ? Colors.orange.text : Colors.bleachOrange.text
+                    }
+                  />
+                </TouchableOpacity>
+              );
+            },
           }}
         />
         <View id="weight-management-container" style={{ flex: 1 }}>
           <View style={pageStyles.WMContainer}>
             <View style={pageStyles.WMCurrentWeightContainer}>
               <View style={pageStyles.WMCurrentWeightTextInputContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    const newPlaceholder = roundNumbers(
-                      parseFloat(placeholder) + 0.1
-                    );
-                    setPlaceHolder(newPlaceholder.toString());
-                  }}
-                >
-                  <AntDesign
-                    name="pluscircleo"
-                    size={SIZES.xl2}
-                    color={Colors.orange.text}
-                  />
-                </TouchableOpacity>
                 <TextInput
                   style={pageStyles.WMCurrentWeightTextInput}
                   inputMode="decimal"
-                  placeholder={placeholder}
+                  placeholder={currentWeightPH}
                   placeholderTextColor={Colors.black.text}
-                  onPressIn={() => setPlaceHolder("")}
+                  onPressIn={() => setCurrentWeightPH("")}
                   onEndEditing={() =>
-                    setPlaceHolder(user.currentWeight.toString())
+                    setCurrentWeightPH(user.currentWeight.toString())
+                  }
+                  onChangeText={(value) =>
+                    value === ""
+                      ? setCurrentWeight(user.currentWeight)
+                      : setCurrentWeight(parseFloat(value))
                   }
                 />
-                <TouchableOpacity
-                  onPress={() => {
-                    const newPlaceholder = roundNumbers(
-                      parseFloat(placeholder) - 0.1
-                    );
-                    setPlaceHolder(newPlaceholder.toString());
-                  }}
-                >
-                  <AntDesign
-                    name="minuscircleo"
-                    size={SIZES.xl2}
-                    color={Colors.orange.text}
-                  />
-                </TouchableOpacity>
               </View>
               <View>
                 <Text style={pageStyles.WMCurrentWeightTextInputLabel}>
@@ -128,8 +176,18 @@ const WeightManagement = () => {
                 <View style={pageStyles.WMWeightTextInputContainer}>
                   <TextInput
                     style={pageStyles.WMWeightTextInput}
-                    placeholder={user.startWeight.toString()}
+                    inputMode="decimal"
+                    placeholder={startWeightPH}
                     placeholderTextColor={Colors.black.text}
+                    onPressIn={() => setStartWeightPH("")}
+                    onEndEditing={() =>
+                      setStartWeightPH(user.startWeight.toString())
+                    }
+                    onChangeText={(value) =>
+                      value === ""
+                        ? setStartWeight(user.startWeight)
+                        : setStartWeight(parseFloat(value))
+                    }
                   />
                 </View>
                 <View>
@@ -142,9 +200,18 @@ const WeightManagement = () => {
                 <View style={pageStyles.WMWeightTextInputContainer}>
                   <TextInput
                     style={pageStyles.WMWeightTextInput}
-                    placeholder={user.weightGoal.toString()}
+                    inputMode="decimal"
+                    placeholder={weightGoalPH}
                     placeholderTextColor={Colors.black.text}
-                    editable={false}
+                    onPressIn={() => setWeightGoalPH("")}
+                    onEndEditing={() =>
+                      setWeightGoalPH(user.weightGoal.toString())
+                    }
+                    onChangeText={(value) =>
+                      value === ""
+                        ? setWeightGoal(user.weightGoal)
+                        : setWeightGoal(parseFloat(value))
+                    }
                   />
                 </View>
                 <View>

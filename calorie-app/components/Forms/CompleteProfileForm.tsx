@@ -64,7 +64,7 @@ const CompleteProfileForm = ({
       height: values.height,
       startWeight: values.weight,
       currentWeight: values.weight,
-      weightHistory: [{ weight: values.weight, date: dateToday }],
+      weightHistory: [{ weight: parseFloat(values.weight), date: dateToday }],
       PA: values.PA,
       calorieGoal: values.calGoal,
       weightGoal: values.weightGoal,
