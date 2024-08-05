@@ -14,8 +14,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import CalorieTrackHome from "./CalorieTrackHome";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import Profile from "@/screens/Profile/Profile";
 import ProfileLayout from "./ProfileLayout";
+import StatsLayout from "./StatsLayout";
 
 const AuthenticationStack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -38,7 +38,10 @@ const Home = () => {
         <NavigationContainer independent={true}>
           <PaperProvider>
             {user ? (
-              <Tabs.Navigator screenOptions={{ headerShown: false }}>
+              <Tabs.Navigator
+                screenOptions={{ headerShown: false }}
+                initialRouteName="Tracker"
+              >
                 <Tabs.Screen
                   name="Tracker"
                   component={CalorieTrackHome}
@@ -46,6 +49,16 @@ const Home = () => {
                     tabBarActiveTintColor: Colors.orange.text,
                     tabBarIcon: () => (
                       <Ionicons name="fast-food" size={24} color="black" />
+                    ),
+                  }}
+                />
+                <Tabs.Screen
+                  name="Stats"
+                  component={StatsLayout}
+                  options={{
+                    tabBarActiveTintColor: Colors.orange.text,
+                    tabBarIcon: () => (
+                      <Ionicons name="stats-chart" size={24} color="black" />
                     ),
                   }}
                 />

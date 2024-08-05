@@ -20,7 +20,7 @@ import { useCreateMeal, useGetMealsByDateAndUser } from "../../api/meals";
 import { useMutation } from "react-query";
 import { CompleteProfile, ErrorAlert } from "@/components/Alerts/Alerts";
 import { Feather, Entypo } from "@expo/vector-icons";
-import { dateToday, dateYesterday } from "@/helpers/dates";
+import { dateToday, dateYesterday, getAge } from "@/helpers/dates";
 import CalendarModal from "@/components/Modals/CalendarModal";
 import CreateMealModal from "@/components/Modals/CreateMealModal";
 import MealHomeSummary from "@/components/Charts/MealHomeSummary";
@@ -31,6 +31,12 @@ import * as OpenAnything from "react-native-openanything";
 import { getAuth } from "firebase/auth";
 import { useGetUserById } from "@/api/user";
 import { useNavigation } from "@react-navigation/native";
+import {
+  formatAMDR,
+  getAMDRCarbs,
+  getAMDRFat,
+  getRDAProtein,
+} from "@/helpers/nutrientsHelpers";
 
 const MealsHome = () => {
   const auth = getAuth();
@@ -192,9 +198,9 @@ const MealsHome = () => {
                             Calories Remaining
                           </Text>
                           <Text style={{ fontSize: SIZES.md }}>
-                            {totalCals >= 2000
+                            {totalCals >= userData.calorieGoal
                               ? 0
-                              : roundNumbers(2000 - totalCals)}
+                              : roundNumbers(userData.calorieGoal - totalCals)}
                           </Text>
                         </View>
                         <View
@@ -223,7 +229,7 @@ const MealsHome = () => {
                             fontStyle: "italic",
                           }}
                         >
-                          2000
+                          {userData.calorieGoal}
                         </Text>
                       </View>
 
@@ -242,7 +248,16 @@ const MealsHome = () => {
                         >
                           <Text style={{ fontSize: SIZES.md }}>Fats:</Text>
                           <Text style={{ fontSize: SIZES.md }}>
-                            {`${getDRI("fats", 65, 1.6764, "male", 21)} grams`}
+                            {formatAMDR(
+                              getAMDRFat(
+                                getAge(userData.DOB),
+                                userData.gender,
+                                userData.PA,
+                                userData.currentWeight,
+                                userData.height
+                              )
+                            )}
+                            g
                           </Text>
                         </View>
                         <View
@@ -254,7 +269,16 @@ const MealsHome = () => {
                         >
                           <Text style={{ fontSize: SIZES.md }}>Carbs:</Text>
                           <Text style={{ fontSize: SIZES.md }}>
-                            {`${getDRI("carbs", 65, 1.6764, "male", 21)} grams`}
+                            {formatAMDR(
+                              getAMDRCarbs(
+                                getAge(userData.DOB),
+                                userData.gender,
+                                userData.PA,
+                                userData.currentWeight,
+                                userData.height
+                              )
+                            )}
+                            g
                           </Text>
                         </View>
                         <View
@@ -266,13 +290,11 @@ const MealsHome = () => {
                         >
                           <Text style={{ fontSize: SIZES.md }}>Proteins:</Text>
                           <Text style={{ fontSize: SIZES.md }}>
-                            {`${getDRI(
-                              "proteins",
-                              65,
-                              1.6764,
-                              "male",
-                              21
-                            )} grams`}
+                            {getRDAProtein(
+                              userData.currentWeight,
+                              getAge(userData.DOB)
+                            )}
+                            g
                           </Text>
                         </View>
 
