@@ -14,28 +14,22 @@ type MealHomeSummaryProps = {
 const MealHomeSummary = ({ meals }: MealHomeSummaryProps) => {
   const width = Dimensions.get("window").width;
 
-  const colors = {
-    fats: "#22B2DA",
-    carbs: "#F0D43A",
-    proteins: "#F23557",
-  };
-
   const data = getNutrientBreakdownByCalorieCount(meals);
 
   const pieData = [
     {
       value: data.fats.perc,
-      color: colors.fats,
+      color: Colors.fats,
       text: `Fats`,
     },
     {
       value: data.carbs.perc,
-      color: colors.carbs,
+      color: Colors.carbs,
       text: `Carbs`,
     },
     {
       value: data.proteins.perc,
-      color: colors.proteins,
+      color: Colors.proteins,
       text: `Proteins`,
     },
   ];

@@ -89,46 +89,6 @@ const MealsHome = () => {
     hideCalendar();
   };
 
-  const getDRI = (
-    nutrient: string,
-    weight: number,
-    height: number,
-    gender: string,
-    age: number
-  ) => {
-    if (nutrient === "carbs") {
-      const PA = gender === "male" ? 1.11 : 1.12;
-      const EER =
-        gender === "male"
-          ? roundNumbers(
-              662 - 9.53 * age + PA * (15.91 * weight + 539.6 * height)
-            )
-          : roundNumbers(
-              354 - 6.91 * age + PA * (9.36 * weight + 726 * height)
-            );
-      return `${roundNumbers((0.45 * EER) / 4)} - ${roundNumbers(
-        (0.65 * EER) / 4
-      )}`;
-    } else if (nutrient === "proteins") {
-      return roundNumbers(0.8 * weight);
-    } else if (nutrient === "fats") {
-      const PA = gender === "male" ? 1.11 : 1.12;
-      const EER =
-        gender === "male"
-          ? roundNumbers(
-              662 - 9.53 * age + PA * (15.91 * weight + 539.6 * height)
-            )
-          : roundNumbers(
-              354 - 6.91 * age + PA * (9.36 * weight + 726 * height)
-            );
-      return `${roundNumbers((0.2 * EER) / 9)} - ${roundNumbers(
-        (0.35 * EER) / 9
-      )}`;
-    } else {
-      return 0;
-    }
-  };
-
   const navigateToCompleteForm = () => {
     navigation.navigate("Profile");
   };

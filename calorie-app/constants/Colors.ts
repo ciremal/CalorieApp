@@ -47,4 +47,7 @@ export const Colors = {
   red: {
     text: "#df1b1b",
   },
+  fats: "#22B2DA",
+  carbs: "#F0D43A",
+  proteins: "#F23557",
 };
