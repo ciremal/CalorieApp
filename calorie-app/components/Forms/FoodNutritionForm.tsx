@@ -16,6 +16,7 @@ type FoodNutritonFormProps = {
   measures: any;
   nutrients: any;
   mealName: string;
+  loadingSubmit: boolean;
 };
 
 const FoodNutritonForm = ({
@@ -28,6 +29,7 @@ const FoodNutritonForm = ({
   measures,
   nutrients,
   mealName,
+  loadingSubmit,
 }: FoodNutritonFormProps): JSX.Element => {
   return (
     <Formik
@@ -172,6 +174,7 @@ const FoodNutritonForm = ({
             buttonColor={Colors.lightOrange.text}
             labelStyle={{ fontSize: 18 }}
             onPress={() => handleSubmit()}
+            loading={loadingSubmit}
           >
             Add to {mealName}
           </Button>

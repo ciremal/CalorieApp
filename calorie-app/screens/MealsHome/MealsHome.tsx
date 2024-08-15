@@ -51,6 +51,8 @@ const MealsHome = () => {
   const showCalendar = () => setCalendarVisible(true);
   const hideCalendar = () => setCalendarVisible(false);
 
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
   const currentDate = dateToday;
   const [selectedDate, setSelectedDate] = useState(currentDate);
 
@@ -73,6 +75,7 @@ const MealsHome = () => {
     mutationFn: useCreateMeal,
     onSuccess: () => {
       hideModal();
+      setLoadingSubmit(false);
       refetch();
     },
     onError: (error: any) => {
@@ -81,6 +84,7 @@ const MealsHome = () => {
   });
 
   const addMeal = async (title: string): Promise<void> => {
+    setLoadingSubmit(true);
     mutate({ title: title, user: user?.uid, createdAt: selectedDate });
   };
 
@@ -291,6 +295,7 @@ const MealsHome = () => {
                     visible={visible}
                     hideModal={hideModal}
                     onSubmit={addMeal}
+                    loadingSubmit={loadingSubmit}
                   />
 
                   <CalendarModal

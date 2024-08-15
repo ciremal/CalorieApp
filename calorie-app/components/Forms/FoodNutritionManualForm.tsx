@@ -15,6 +15,7 @@ type FoodNutritonFormProps = {
   measures: any[];
   allNutrients: any[];
   params: any;
+  loadingSubmit: boolean;
 };
 
 const FoodNutritonManualForm = ({
@@ -24,6 +25,7 @@ const FoodNutritonManualForm = ({
   measures,
   allNutrients,
   params,
+  loadingSubmit,
 }: FoodNutritonFormProps): JSX.Element => {
   const foodItem = params ? params.foodItem : null;
 
@@ -304,6 +306,7 @@ const FoodNutritonManualForm = ({
             buttonColor={Colors.lightOrange.text}
             labelStyle={{ fontSize: 18 }}
             onPress={() => handleSubmit()}
+            loading={loadingSubmit}
           >
             {foodItem ? `Save Changes` : `Add to ${mealName}`}
           </Button>

@@ -39,6 +39,8 @@ const MealSummary = () => {
 
   const [mealsTotals, setMealsTotals] = useState([]);
 
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
   const { data: mealData, isFetching, error, refetch } = useGetMealById(id);
 
   const { mutate: deleteMealItem } = useMutation({
@@ -48,6 +50,7 @@ const MealSummary = () => {
         queryKey: ["getMealsByDateAndUser", createdAt, user?.uid],
         active: true,
       });
+      setLoadingDelete(false);
       navigation.navigate("Meal Home");
     },
   });
@@ -60,14 +63,17 @@ const MealSummary = () => {
         queryKey: ["getMealsByDate", createdAt],
         active: true,
       });
+      setLoadingDelete(false);
     },
   });
 
   const handleDeleteMeal = (mealId: string) => {
+    setLoadingDelete(true);
     deleteMealItem(mealId);
   };
 
   const handleDeleteFoodItem = (foodId: string, hideDialog: () => void) => {
+    setLoadingDelete(true);
     deleteFoodItem({ mealId: id, foodId: foodId });
     hideDialog();
   };
@@ -138,6 +144,7 @@ const MealSummary = () => {
                   <FoodItemBox
                     foodItem={item}
                     handleDelete={handleDeleteFoodItem}
+                    loadingDelete={loadingDelete}
                   />
                 </View>
               )}
@@ -168,6 +175,7 @@ const MealSummary = () => {
               id={id}
               title="Are you sure you want to delete this meal?"
               warning="This meal will be deleted permanently. You cannot undo this action."
+              loadingDelete={loadingDelete}
             />
           </>
         )}

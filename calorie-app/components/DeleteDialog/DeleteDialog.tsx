@@ -10,6 +10,7 @@ type DeleteDialogProps = {
   id: string;
   title?: string;
   warning: string;
+  loadingDelete: boolean;
 };
 
 const DeleteDialog = ({
@@ -19,6 +20,7 @@ const DeleteDialog = ({
   id,
   title,
   warning,
+  loadingDelete,
 }: DeleteDialogProps): JSX.Element => {
   return (
     <Portal>
@@ -61,6 +63,7 @@ const DeleteDialog = ({
             style={deleteDialogStyles.dialogButton}
             contentStyle={{ paddingHorizontal: "6%" }}
             onPress={() => onSubmit(id, hideDialog)}
+            loading={loadingDelete}
           >
             Delete
           </Button>

@@ -13,9 +13,14 @@ import NutrientBreakdownModal from "../Modals/NutrientBreakdownModal";
 type FoodItemBoxProps = {
   foodItem: any;
   handleDelete: (foodId: string, hideDialog: () => void) => void;
+  loadingDelete: boolean;
 };
 
-const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
+const FoodItemBox = ({
+  foodItem,
+  handleDelete,
+  loadingDelete,
+}: FoodItemBoxProps) => {
   const {
     _id: id,
     name,
@@ -65,13 +70,6 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
             <Text style={foodItemBoxStyles.notesBody}>{notes}</Text>
           </View>
         </View>
-        {/* <View style={foodItemBoxStyles.dropdownEditIcon}>
-          <AntDesign
-            name="caretright"
-            size={SIZES.md}
-            color={Colors.lightWhite.text}
-          />
-        </View> */}
         <NutrientBreakdownModal
           visible={nutrientBreakdownVisible}
           hideModal={hideNutrientBreakdown}
@@ -156,6 +154,7 @@ const FoodItemBox = ({ foodItem, handleDelete }: FoodItemBoxProps) => {
         onSubmit={handleDelete}
         id={id}
         warning={`Are you sure you want to delete ${name} from this meal?`}
+        loadingDelete={loadingDelete}
       />
     </View>
   );

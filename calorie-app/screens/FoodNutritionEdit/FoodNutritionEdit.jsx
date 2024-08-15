@@ -32,6 +32,8 @@ const FoodNutritionEdit = () => {
 
   const [measures, setMeasures] = useState(JSON.parse(measureOptions));
 
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
   const { data, isLoading, error } = useFetchSpecificFood(
     foodId,
     100,
@@ -48,6 +50,7 @@ const FoodNutritionEdit = () => {
     mutationFn: useUpdateMealAddFoodItem,
     onSuccess: async () => {
       await queryClient.refetchQueries();
+      setLoadingSubmit(false);
       navigation.navigate("Meal Summary");
     },
   });
@@ -100,6 +103,8 @@ const FoodNutritionEdit = () => {
       notes: notes,
       mainNutrients: mainNutrients,
     };
+
+    setLoadingSubmit(true);
 
     mutate({
       id: selectedMeal._id,
@@ -157,6 +162,7 @@ const FoodNutritionEdit = () => {
                 measures={measures}
                 nutrients={nutrients}
                 mealName={selectedMeal.title}
+                loadingSubmit={loadingSubmit}
               />
             )}
           </View>

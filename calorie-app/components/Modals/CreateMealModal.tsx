@@ -8,12 +8,14 @@ type CreateMealModalProps = {
   visible: boolean;
   hideModal: () => void;
   onSubmit: (values: any) => Promise<void>;
+  loadingSubmit: boolean;
 };
 
 const CreateMealModal = ({
   visible,
   hideModal,
   onSubmit,
+  loadingSubmit,
 }: CreateMealModalProps): JSX.Element => {
   return (
     <>
@@ -77,6 +79,7 @@ const CreateMealModal = ({
                       labelStyle={{ fontSize: 18 }}
                       style={{ width: "40%", marginTop: 10 }}
                       onPress={() => handleSubmit()}
+                      loading={loadingSubmit}
                     >
                       Add
                     </Button>

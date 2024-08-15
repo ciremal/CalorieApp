@@ -5,7 +5,7 @@ import { Stack } from "expo-router";
 import { foodNutritionEditManualStyles as pageStyles } from "../FoodNutritionEditManual/FoodNutrtionEditManualStyles";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useUpdateFoodItem, useUpdateMealAddFoodItem } from "@/api/meals";
@@ -22,11 +22,14 @@ const FoodNutritionEditManual = () => {
 
   const nutrients = allNutrients.map((item) => item);
 
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
   const queryClient = useQueryClient();
   const { mutate: mutateUpdateMealAddFoodItem } = useMutation({
     mutationFn: useUpdateMealAddFoodItem,
     onSuccess: async () => {
       await queryClient.refetchQueries();
+      setLoadingSubmit(false);
       navigation.navigate("Meal Summary");
     },
   });
@@ -35,6 +38,7 @@ const FoodNutritionEditManual = () => {
     mutationFn: useUpdateFoodItem,
     onSuccess: async () => {
       await queryClient.refetchQueries();
+      setLoadingSubmit(false);
       navigation.navigate("Meal Summary");
     },
   });
@@ -69,6 +73,8 @@ const FoodNutritionEditManual = () => {
       notes: notes,
       mainNutrients: mainNutrients,
     };
+
+    setLoadingSubmit(true);
 
     mutateUpdateMealAddFoodItem({
       id: selectedMeal._id,
@@ -112,6 +118,8 @@ const FoodNutritionEditManual = () => {
       mainNutrients: mainNutrients,
     };
 
+    setLoadingSubmit(true);
+
     mutateUpdateFoodItem({
       id: selectedMeal._id,
       foodItemId: foodItemId,
@@ -152,6 +160,7 @@ const FoodNutritionEditManual = () => {
               measures={unitOfMeasurements}
               allNutrients={nutrients}
               params={route.params}
+              loadingSubmit={loadingSubmit}
             />
           </View>
         </KeyboardAwareScrollView>
