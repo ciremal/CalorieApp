@@ -16,6 +16,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import ProfileLayout from "./ProfileLayout";
 import StatsLayout from "./StatsLayout";
+import ForgotPassword from "@/screens/ForgotPassword/ForgotPassword";
 
 const AuthenticationStack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -88,6 +89,10 @@ const Home = () => {
                 <AuthenticationStack.Screen
                   name="Sign In Screen"
                   component={AppSignIn}
+                />
+                <AuthenticationStack.Screen
+                  name="Forgot Password"
+                  component={ForgotPassword}
                 />
               </AuthenticationStack.Navigator>
             )}

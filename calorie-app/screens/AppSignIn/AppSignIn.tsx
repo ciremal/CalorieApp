@@ -1,4 +1,4 @@
-import { View, Text, Platform } from "react-native";
+import { View, Text, Platform, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "@/constants/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -51,7 +51,10 @@ const AppSignIn = () => {
         >
           <SignInForm />
 
-          <View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Forgot Password")}
+            activeOpacity={0.7}
+          >
             <Text
               style={{
                 fontSize: SIZES.md,
@@ -61,7 +64,7 @@ const AppSignIn = () => {
             >
               Forgot Password?
             </Text>
-          </View>
+          </TouchableOpacity>
 
           <View style={{ flexDirection: "row", columnGap: "8%" }}>
             <Text style={{ fontSize: SIZES.md }}>Don't have an account?</Text>

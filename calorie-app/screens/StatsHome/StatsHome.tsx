@@ -1,9 +1,9 @@
-import { ScrollView, View } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 import styles from "@/styles/general";
 import { Colors } from "@/constants/Colors";
 import { SIZES } from "@/constants/sizes";
 import { ErrorAlert } from "@/components/Alerts/Alerts";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, Divider } from "react-native-paper";
 import { getAuth } from "firebase/auth";
 import { useGetUserById } from "@/api/user";
 import CalorieChart from "@/components/StatsComponents/CalorieChart";
@@ -16,8 +16,9 @@ const StatsHome = () => {
   const { data, isFetching, error } = useGetUserById(user?.uid);
 
   return (
-    <ScrollView>
-      <View style={styles.body}>
+    <SafeAreaView style={styles.body}>
+      <Divider style={styles.divider} />
+      <ScrollView>
         {error && (
           <ErrorAlert
             message={"Could not load charts. Please try again later"}
@@ -37,8 +38,8 @@ const StatsHome = () => {
             <MacroChart userData={data} />
           </View>
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
