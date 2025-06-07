@@ -1,6 +1,4 @@
 import express from "express";
-// import bodyParser from "body-parser";
-// import { PORT, mongDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import routes from "./routes/index.js";
@@ -10,18 +8,13 @@ app.use(cors());
 app.use(express.json());
 
 mongoose
-  .connect(
-    "mongodb+srv://ericlam42:cRoHGgaQmmxibIXP@calorieappcluster.hobpged.mongodb.net/CalorieApp"
-  )
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to database");
   })
   .catch((err) => {
     console.log(err);
   });
-
-// app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(bodyParser.json());
 
 app.use(routes);
 

@@ -5,6 +5,10 @@ import roundNumbers from "../helpers/roundNumbers.js";
 
 const router = Router();
 
+/**
+ * GET /getMeals
+ * Fetches all meals from the database.
+ */
 router.get("/getMeals", async (req, res) => {
   MealModel.find({})
     .then(function (meal) {
@@ -23,6 +27,10 @@ router.get("/getMeals", async (req, res) => {
     });
 });
 
+/**
+ * POST /getMealsByDateAndUser
+ * Returns meals that match a specific date and user ID.
+ */
 router.post("/getMealsByDateAndUser", async (req, res) => {
   const { date, user } = req.body;
   await MealModel.find({ createdAt: date, user: user })
@@ -42,6 +50,10 @@ router.post("/getMealsByDateAndUser", async (req, res) => {
     });
 });
 
+/**
+ * POST /getMealById
+ * Fetches a meal by its MongoDB ObjectId and populates food items.
+ */
 router.post("/getMealById", async (req, res) => {
   const { id } = req.body;
   await MealModel.findById(id)
@@ -62,6 +74,10 @@ router.post("/getMealById", async (req, res) => {
     });
 });
 
+/**
+ * POST /createMeal
+ * Creates a new meal from the request body.
+ */
 router.post("/createMeal", async (req, res) => {
   try {
     const meal = req.body;
@@ -91,33 +107,17 @@ router.post("/createMeal", async (req, res) => {
   }
 });
 
-// router.post("/createFoodItem", async (req, res) => {
-//   try {
-//     const foodItem = req.body;
-//     const newFoodItem = new FoodItemModel(foodItem);
-//     await newFoodItem.save();
-
-//     res.status(201).json({
-//       success: true,
-//       message: "FoodItem created successfully",
-//       data: newFoodItem,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Please enter a name for the meal",
-//       error: e.message,
-//     });
-//   }
-// });
-
+/**
+ * POST /deleteMeal
+ * Deletes a meal and all its associated food items.
+ */
 router.post("/deleteMeal", async (req, res) => {
   try {
     const { id } = req.body;
 
     const meal = await MealModel.findById(id);
-    await FoodItemModel.deleteMany({ _id: { $in: meal.foodItems } });
-    await MealModel.deleteOne({ _id: id });
+    await FoodItemModel.deleteMany({ _id: { $in: meal.foodItems } }); // Delete all related food items
+    await MealModel.deleteOne({ _id: id }); // Delete the meal
 
     res.status(201).json({
       success: true,
@@ -133,14 +133,21 @@ router.post("/deleteMeal", async (req, res) => {
   }
 });
 
+/**
+ * POST /deleteMealFoodItem
+ * Removes a specific food item from a meal and updates meal's totals.
+ */
 router.post("/deleteMealFoodItem", async (req, res) => {
   try {
     const { mealId, foodId } = req.body;
 
     const foodItem = await FoodItemModel.findByIdAndDelete(foodId);
     let meal = await MealModel.findById(mealId);
+
+    // Remove food item from meal
     meal.foodItems = meal.foodItems.filter((item) => item.toString() != foodId);
 
+    // Subtract nutrients from meal totals
     const { cals, carbs, fats, proteins } = foodItem.mainNutrients;
     meal.cals = roundNumbers(meal.cals - cals);
     meal.carbs = roundNumbers(meal.carbs - carbs);
@@ -163,17 +170,20 @@ router.post("/deleteMealFoodItem", async (req, res) => {
   }
 });
 
+/**
+ * POST /updateMealAddFoodItem
+ * Adds a new food item to an existing meal and updates nutritional values.
+ */
 router.post("/updateMealAddFoodItem", async (req, res) => {
   try {
     const { id, foodItem, mainNutrients } = req.body;
     const { cals, carbs, fats, proteins } = mainNutrients;
 
-    // Create new FoodItem
     const newFoodItem = new FoodItemModel(foodItem);
     await newFoodItem.save();
 
     const meal = await MealModel.findById(id);
-    meal.foodItems.push(newFoodItem);
+    meal.foodItems.push(newFoodItem); // Add food item reference
     meal.cals = roundNumbers(meal.cals + cals);
     meal.carbs = roundNumbers(meal.carbs + carbs);
     meal.fats = roundNumbers(meal.fats + fats);
@@ -195,6 +205,10 @@ router.post("/updateMealAddFoodItem", async (req, res) => {
   }
 });
 
+/**
+ * POST /updateFoodItem
+ * Updates a food item and recalculates the meal's nutritional values accordingly.
+ */
 router.post("/updateFoodItem", async (req, res) => {
   try {
     const { id, foodItemId, foodItem, mainNutrients, oldMainNutrients } =
@@ -212,6 +226,7 @@ router.post("/updateFoodItem", async (req, res) => {
       }
     );
 
+    // Adjust meal nutrition
     const meal = await MealModel.findById(id);
     meal.cals = roundNumbers(meal.cals + cals - oldMainNutrients.cals);
     meal.carbs = roundNumbers(meal.carbs + carbs - oldMainNutrients.carbs);
@@ -236,7 +251,10 @@ router.post("/updateFoodItem", async (req, res) => {
   }
 });
 
-//BOILERPLATE ROUTE
+/**
+ * Example boilerplate route (commented out).
+ * Structure for future endpoints.
+ */
 // router.post("/name", async (req, res) => {
 //   try {
 //     const { } = req.body
