@@ -47,13 +47,19 @@ router.get("/stats/calories", async (req, res) => {
       },
     ]);
 
-    const existingDates = new Set(meals.map((item) => item._id));
+    const existingDates = meals.map((item) => item._id);
     const result = dates.map((date) => {
-      const match = meals.find((item) => item._id === date);
-      return {
-        date,
-        totalCals: match ? match.totalCals : 0,
-      };
+      if (!existingDates.includes(date)) {
+        return {
+          date: date,
+          totalCals: 0,
+        };
+      } else {
+        return {
+          date: date,
+          totalCals: meals.find((item) => item._id === date).totalCals,
+        };
+      }
     });
 
     res.status(200).json({
