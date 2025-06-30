@@ -6,113 +6,97 @@ import { startOfWeek, subWeeks, add } from "date-fns";
 const router = Router();
 
 /**
- * POST /getCalorieChartStats
- * Retrieves total daily calories for a given week ("This Week" or "Last Week") for a specific user
+ * GET /stats/calories
+ * Retrieves total daily calories for a given week ("This Week" or "Last Week") for a specific user.
  */
-router.post("/getCalorieChartStats", async (req, res) => {
+router.get("/stats/calories", async (req, res) => {
   try {
-    const { period, userId } = req.body;
-    let currDate;
+    const { period, userId } = req.query;
+    let referenceDate;
 
-    // Determine the reference date based on selected period
     switch (period) {
       case "This Week":
-        currDate = new Date(); // today's date
+        referenceDate = new Date();
         break;
       case "Last Week":
-        currDate = subWeeks(new Date(), 1); // date one week ago
+        referenceDate = subWeeks(new Date(), 1);
         break;
       default:
-        break;
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid period value" });
     }
 
-    // Get the start of the week (Sunday) and create an array of dates for the week
-    const start = startOfWeek(currDate);
-    const dates = [];
+    const start = startOfWeek(referenceDate);
+    const dates = Array.from({ length: 7 }, (_, i) =>
+      formatDate(add(start, { days: i }))
+    );
 
-    for (let i = 0; i < 7; i++) {
-      dates.push(formatDate(add(start, { days: i }))); // format each date
-    }
-
-    // Aggregate total calories grouped by date
     const meals = await MealModel.aggregate([
-      { $match: { createdAt: { $in: dates }, user: userId } }, // filter by user and date
+      { $match: { createdAt: { $in: dates }, user: userId } },
       {
         $group: {
-          _id: "$createdAt", // group by creation date
-          totalCals: {
-            $sum: "$cals", // sum of calories
-          },
+          _id: "$createdAt",
+          totalCals: { $sum: "$cals" },
         },
       },
       {
         $addFields: {
-          totalCals: { $round: ["$totalCals", 2] }, // round to 2 decimals
+          totalCals: { $round: ["$totalCals", 2] },
         },
       },
     ]);
 
-    // Fill in 0s for any missing days in the week
-    const existingDates = meals.map((item) => item._id);
+    const existingDates = new Set(meals.map((item) => item._id));
     const result = dates.map((date) => {
-      if (!existingDates.includes(date)) {
-        return {
-          date: date,
-          totalCals: 0,
-        };
-      } else {
-        return {
-          date: date,
-          totalCals: meals.find((item) => item._id === date).totalCals,
-        };
-      }
+      const match = meals.find((item) => item._id === date);
+      return {
+        date,
+        totalCals: match ? match.totalCals : 0,
+      };
     });
 
-    // Send successful response with calorie data
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "Success",
+      message: "Calorie stats retrieved",
       data: result,
     });
   } catch (error) {
-    // Error handling
     res.status(500).json({
       success: false,
-      error: error,
+      message: "Failed to fetch calorie stats",
+      error: error.message,
     });
   }
 });
 
 /**
- * POST /getMacroChartStats
- * Retrieves total daily macronutrients (carbs, fats, proteins) for the selected week and user
+ * GET /stats/macros
+ * Retrieves total daily macronutrients for the given week ("This Week" or "Last Week") and user.
  */
-router.post("/getMacroChartStats", async (req, res) => {
+router.get("/stats/macros", async (req, res) => {
   try {
-    const { period, userId } = req.body;
-    let currDate;
+    const { period, userId } = req.query;
+    let referenceDate;
 
-    // Determine the base date from the selected period
     switch (period) {
       case "This Week":
-        currDate = new Date();
+        referenceDate = new Date();
         break;
       case "Last Week":
-        currDate = subWeeks(new Date(), 1);
+        referenceDate = subWeeks(new Date(), 1);
         break;
       default:
-        break;
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid period value" });
     }
 
-    // Generate a week's worth of dates starting from Sunday
-    const start = startOfWeek(currDate);
-    const dates = [];
+    const start = startOfWeek(referenceDate);
+    const dates = Array.from({ length: 7 }, (_, i) =>
+      formatDate(add(start, { days: i }))
+    );
 
-    for (let i = 0; i < 7; i++) {
-      dates.push(formatDate(add(start, { days: i })));
-    }
-
-    // Aggregate macronutrients for each day
     const meals = await MealModel.aggregate([
       { $match: { createdAt: { $in: dates }, user: userId } },
       {
@@ -153,17 +137,14 @@ router.post("/getMacroChartStats", async (req, res) => {
       }
     });
 
-    // Send successful response with macro data
-    res.status(201).json({
-      success: true,
-      message: "Success",
-      data: result,
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "Macro stats retrieved", data: result });
   } catch (error) {
-    // Error handling
     res.status(500).json({
       success: false,
-      error: error,
+      message: "Failed to fetch macro stats",
+      error: error.message,
     });
   }
 });

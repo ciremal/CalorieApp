@@ -4,135 +4,111 @@ import { UserModel } from "../models/User.js";
 const router = Router();
 
 /**
- * POST /getUserById
- * Fetch a user by ID, converting all Decimal128 fields to float values for frontend use
+ * GET /users/:id
+ * Fetch a user by ID, converting Decimal128 fields to floats for frontend use.
  */
-router.post("/getUserById", async (req, res) => {
+router.get("/users/:id", async (req, res) => {
   try {
-    const { id } = req.body;
-
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    // Convert Decimal128 fields to float (usable in frontend apps)
     const userData = user.toObject();
-    userData.height = parseFloat(userData.height.toString());
-    userData.currentWeight = parseFloat(userData.currentWeight.toString());
-    userData.startWeight = parseFloat(userData.startWeight.toString());
-    userData.weightGoal = parseFloat(userData.weightGoal.toString());
-    userData.calorieGoal = parseFloat(userData.calorieGoal.toString());
+    userData.height = parseFloat(userData.height?.toString());
+    userData.currentWeight = parseFloat(userData.currentWeight?.toString());
+    userData.startWeight = parseFloat(userData.startWeight?.toString());
+    userData.weightGoal = parseFloat(userData.weightGoal?.toString());
+    userData.calorieGoal = parseFloat(userData.calorieGoal?.toString());
 
-    res.status(201).json({
-      success: true,
-      message: "User found",
-      data: userData,
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "User found", data: userData });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to fetch user",
+        error: error.message,
+      });
   }
 });
 
 /**
- * POST /createUser
- * Create a new user document with the provided data and a specific UID
+ * POST /users
+ * Create a new user document with a provided UID.
  */
-router.post("/createUser", async (req, res) => {
+router.post("/users", async (req, res) => {
   try {
     const { user, uid } = req.body;
-
     const newUser = new UserModel(user);
-    newUser._id = uid; // set custom _id to match Firebase UID or other unique identifier
+    newUser._id = uid;
     await newUser.save();
 
-    res.status(201).json({
-      success: true,
-      message: "User created successfully",
-      data: newUser,
-    });
+    res
+      .status(201)
+      .json({ success: true, message: "User created", data: newUser });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to create user",
+        error: error.message,
+      });
   }
 });
 
 /**
- * POST /updateUser
- * Update general user information such as name, weight, PA, profile completion, etc.
+ * PATCH /users/:id
+ * Update general user information.
  */
-router.post("/updateUser", async (req, res) => {
+router.patch("/users/:id", async (req, res) => {
   try {
-    const { id, user } = req.body;
-
-    const {
-      name,
-      gender,
-      DOB,
-      height,
-      startWeight,
-      currentWeight,
-      weightHistory,
-      weightGoal,
-      calorieGoal,
-      PA,
-      profileComplete,
-    } = user;
+    const updateFields = req.body;
 
     const updatedUser = await UserModel.updateOne(
-      { _id: id },
-      {
-        name,
-        gender,
-        DOB,
-        height,
-        startWeight,
-        currentWeight,
-        weightHistory,
-        weightGoal,
-        calorieGoal,
-        PA,
-        profileComplete,
-      }
+      { _id: req.params.id },
+      updateFields
     );
-
-    res.status(201).json({
-      success: true,
-      message: "User updated successfully",
-      data: updatedUser,
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "User updated", data: updatedUser });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to update user",
+        error: error.message,
+      });
   }
 });
 
 /**
- * POST /updateWeight
- * Update the user's weightGoal, startWeight, and currentWeight.
- * Also adds a new entry to the weightHistory array if provided.
+ * PATCH /users/:id/weight
+ * Update weightGoal, startWeight, currentWeight and append weightHistory entry.
  */
-router.post("/updateWeight", async (req, res) => {
+router.patch("/users/:id/weight", async (req, res) => {
   try {
-    const { id, weightGoal, startWeight, currentWeight, weightLog } = req.body;
+    const { weightGoal, startWeight, currentWeight, weightLog } = req.body;
+    const user = await UserModel.findById(req.params.id);
 
-    const user = await UserModel.findById(id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
     if (weightLog) {
-      user.weightHistory.push(weightLog); // append new log entry
+      user.weightHistory.push(weightLog);
     }
 
     const updatedUser = await UserModel.updateOne(
-      { _id: id },
+      { _id: req.params.id },
       {
         weightGoal,
         startWeight,
@@ -141,44 +117,51 @@ router.post("/updateWeight", async (req, res) => {
       }
     );
 
-    res.status(201).json({
-      success: true,
-      message: "User updated successfully",
-      data: updatedUser,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "User weight updated",
+        data: updatedUser,
+      });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to update weight",
+        error: error.message,
+      });
   }
 });
 
 /**
- * POST /updateCalorieGoal
- * Update only the user's calorieGoal
+ * PATCH /users/:id/calorie-goal
+ * Update the user's calorieGoal only.
  */
-router.post("/updateCalorieGoal", async (req, res) => {
+router.patch("/users/:id/calorie-goal", async (req, res) => {
   try {
-    const { id, calorieGoal } = req.body;
-
+    const { calorieGoal } = req.body;
     const updatedUser = await UserModel.updateOne(
-      { _id: id },
-      {
-        calorieGoal,
-      }
+      { _id: req.params.id },
+      { calorieGoal }
     );
 
-    res.status(201).json({
-      success: true,
-      message: "User updated successfully",
-      data: updatedUser,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Calorie goal updated",
+        data: updatedUser,
+      });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to update calorie goal",
+        error: error.message,
+      });
   }
 });
 

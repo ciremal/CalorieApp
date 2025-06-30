@@ -6,148 +6,131 @@ import roundNumbers from "../helpers/roundNumbers.js";
 const router = Router();
 
 /**
- * GET /getMeals
+ * GET /meals
  * Fetches all meals from the database.
  */
-router.get("/getMeals", async (req, res) => {
-  MealModel.find({})
-    .then(function (meal) {
-      res.status(201).json({
-        success: true,
-        message: "Meal successfully found",
-        data: meal,
-      });
-    })
-    .catch(function (error) {
-      res.status(500).json({
+router.get("/meals", async (req, res) => {
+  try {
+    const meals = await MealModel.find({});
+    res
+      .status(200)
+      .json({ success: true, message: "Meals retrieved", data: meals });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
         success: false,
-        message: "Error finding Meal",
-        error: error,
+        message: "Failed to fetch meals",
+        error: error.message,
       });
-    });
+  }
 });
 
 /**
- * POST /getMealsByDateAndUser
+ * POST /meals/by-date-user
  * Returns meals that match a specific date and user ID.
  */
-router.post("/getMealsByDateAndUser", async (req, res) => {
+router.post("/meals/by-date-user", async (req, res) => {
   const { date, user } = req.body;
-  await MealModel.find({ createdAt: date, user: user })
-    .then(function (meal) {
-      res.status(201).json({
-        success: true,
-        message: "Meal successfully found",
-        data: meal,
-      });
-    })
-    .catch(function (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error finding Meal",
-        error: error,
-      });
-    });
-});
-
-/**
- * POST /getMealById
- * Fetches a meal by its MongoDB ObjectId and populates food items.
- */
-router.post("/getMealById", async (req, res) => {
-  const { id } = req.body;
-  await MealModel.findById(id)
-    .populate("foodItems")
-    .then(function (meal) {
-      res.status(201).json({
-        success: true,
-        message: "Meal successfully found",
-        data: meal,
-      });
-    })
-    .catch(function (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error finding Meal",
-        error: error,
-      });
-    });
-});
-
-/**
- * POST /createMeal
- * Creates a new meal from the request body.
- */
-router.post("/createMeal", async (req, res) => {
   try {
-    const meal = req.body;
-    const newMeal = new MealModel(meal);
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const meals = await MealModel.find({
+      createdAt: { $gte: start, $lte: end },
+      user,
+    });
+    res
+      .status(200)
+      .json({ success: true, message: "Meals retrieved", data: meals });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to fetch meals",
+        error: error.message,
+      });
+  }
+});
+
+/**
+ * GET /meals/:id
+ * Fetches a meal by its ID and populates food items.
+ */
+router.get("/meals/:id", async (req, res) => {
+  try {
+    const meal = await MealModel.findById(req.params.id).populate("foodItems");
+    res
+      .status(200)
+      .json({ success: true, message: "Meal retrieved", data: meal });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to fetch meal",
+        error: error.message,
+      });
+  }
+});
+
+/**
+ * POST /meals
+ * Creates a new meal.
+ */
+router.post("/meals", async (req, res) => {
+  try {
+    const newMeal = new MealModel(req.body);
     await newMeal.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Meal created successfully",
-      data: newMeal,
-    });
+    res
+      .status(201)
+      .json({ success: true, message: "Meal created", data: newMeal });
   } catch (error) {
-    let errorMessage;
-    if (error.name === "ValidationError") {
-      if (error.errors["title"]) {
-        errorMessage = error.errors["title"].message;
-      }
-    } else {
-      errorMessage = "Unexpected error";
-    }
-
-    res.status(500).json({
-      success: false,
-      message: errorMessage,
-      error: error,
-    });
+    const message = error?.errors?.title?.message || "Unexpected error";
+    res.status(500).json({ success: false, message, error: error.message });
   }
 });
 
 /**
- * POST /deleteMeal
- * Deletes a meal and all its associated food items.
+ * DELETE /meals/:id
+ * Deletes a meal and its associated food items.
  */
-router.post("/deleteMeal", async (req, res) => {
+router.delete("/meals/:id", async (req, res) => {
   try {
-    const { id } = req.body;
-
-    const meal = await MealModel.findById(id);
-    await FoodItemModel.deleteMany({ _id: { $in: meal.foodItems } }); // Delete all related food items
-    await MealModel.deleteOne({ _id: id }); // Delete the meal
-
-    res.status(201).json({
-      success: true,
-      message: "Meal deleted successfully",
-      data: meal,
-    });
+    const meal = await MealModel.findById(req.params.id);
+    await FoodItemModel.deleteMany({ _id: { $in: meal.foodItems } });
+    await MealModel.deleteOne({ _id: req.params.id });
+    res
+      .status(200)
+      .json({ success: true, message: "Meal deleted", data: meal });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error deleting Meal",
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to delete meal",
+        error: error.message,
+      });
   }
 });
 
 /**
- * POST /deleteMealFoodItem
- * Removes a specific food item from a meal and updates meal's totals.
+ * PATCH /meals/:mealId/food-items/:foodId
+ * Removes a food item from a meal and updates meal totals.
  */
-router.post("/deleteMealFoodItem", async (req, res) => {
+router.patch("/meals/:mealId/food-items/:foodId", async (req, res) => {
   try {
-    const { mealId, foodId } = req.body;
-
+    const { mealId, foodId } = req.params;
     const foodItem = await FoodItemModel.findByIdAndDelete(foodId);
-    let meal = await MealModel.findById(mealId);
+    const meal = await MealModel.findById(mealId);
 
-    // Remove food item from meal
-    meal.foodItems = meal.foodItems.filter((item) => item.toString() != foodId);
+    meal.foodItems = meal.foodItems.filter(
+      (item) => item.toString() !== foodId
+    );
 
-    // Subtract nutrients from meal totals
     const { cals, carbs, fats, proteins } = foodItem.mainNutrients;
     meal.cals = roundNumbers(meal.cals - cals);
     meal.carbs = roundNumbers(meal.carbs - carbs);
@@ -156,34 +139,34 @@ router.post("/deleteMealFoodItem", async (req, res) => {
 
     await meal.save();
 
-    res.status(201).json({
-      success: true,
-      message: "FoodItem deleted successfully",
-      data: meal,
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "Food item removed", data: meal });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error deleting FoodItem",
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to remove food item",
+        error: error.message,
+      });
   }
 });
 
 /**
- * POST /updateMealAddFoodItem
- * Adds a new food item to an existing meal and updates nutritional values.
+ * PATCH /meals/:id/add-food-item
+ * Adds a food item to a meal and updates nutritional values.
  */
-router.post("/updateMealAddFoodItem", async (req, res) => {
+router.patch("/meals/:id/add-food-item", async (req, res) => {
   try {
-    const { id, foodItem, mainNutrients } = req.body;
+    const { foodItem, mainNutrients } = req.body;
     const { cals, carbs, fats, proteins } = mainNutrients;
 
     const newFoodItem = new FoodItemModel(foodItem);
     await newFoodItem.save();
 
-    const meal = await MealModel.findById(id);
-    meal.foodItems.push(newFoodItem); // Add food item reference
+    const meal = await MealModel.findById(req.params.id);
+    meal.foodItems.push(newFoodItem);
     meal.cals = roundNumbers(meal.cals + cals);
     meal.carbs = roundNumbers(meal.carbs + carbs);
     meal.fats = roundNumbers(meal.fats + fats);
@@ -191,43 +174,42 @@ router.post("/updateMealAddFoodItem", async (req, res) => {
 
     await meal.save();
 
-    res.status(201).json({
-      success: true,
-      message: "FoodItem added successfully",
-      data: meal,
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "Food item added", data: meal });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error adding FoodItem",
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to add food item",
+        error: error.message,
+      });
   }
 });
 
 /**
- * POST /updateFoodItem
- * Updates a food item and recalculates the meal's nutritional values accordingly.
+ * PATCH /meals/:id/update-food-item/:foodItemId
+ * Updates a food item and adjusts the meal's nutritional totals.
  */
-router.post("/updateFoodItem", async (req, res) => {
+router.patch("/meals/:id/update-food-item/:foodItemId", async (req, res) => {
   try {
-    const { id, foodItemId, foodItem, mainNutrients, oldMainNutrients } =
-      req.body;
+    const { foodItem, mainNutrients, oldMainNutrients } = req.body;
     const { cals, carbs, fats, proteins } = mainNutrients;
+
     const updatedFoodItem = await FoodItemModel.updateOne(
-      { _id: foodItemId },
+      { _id: req.params.foodItemId },
       {
         name: foodItem.name,
         quantity: foodItem.quantity,
         unitOfMeasurement: foodItem.unitOfMeasurement,
         notes: foodItem.notes,
         nutrients: foodItem.nutrients,
-        mainNutrients: mainNutrients,
+        mainNutrients,
       }
     );
 
-    // Adjust meal nutrition
-    const meal = await MealModel.findById(id);
+    const meal = await MealModel.findById(req.params.id);
     meal.cals = roundNumbers(meal.cals + cals - oldMainNutrients.cals);
     meal.carbs = roundNumbers(meal.carbs + carbs - oldMainNutrients.carbs);
     meal.fats = roundNumbers(meal.fats + fats - oldMainNutrients.fats);
@@ -237,41 +219,22 @@ router.post("/updateFoodItem", async (req, res) => {
 
     await meal.save();
 
-    res.status(201).json({
-      success: true,
-      message: "FoodItem updated successfully",
-      data: updatedFoodItem,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Food item updated",
+        data: updatedFoodItem,
+      });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error updating FoodItem",
-      error: error,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to update food item",
+        error: error.message,
+      });
   }
 });
-
-/**
- * Example boilerplate route (commented out).
- * Structure for future endpoints.
- */
-// router.post("/name", async (req, res) => {
-//   try {
-//     const { } = req.body
-//     //  Implement logic here
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Successful message",
-//       data: meal,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Error message",
-//       error: error,
-//     });
-//   }
-// });
 
 export default router;
