@@ -5,111 +5,69 @@ const backendIp = process.env.EXPO_PUBLIC_BACKEND_IP;
 
 export const useGetUserById = (id) => {
   return useQuery(["getUserById", id], async () => {
-    return await axios
-      .post(`http://${backendIp}:5000/users/getUserById`, { id })
-      .then((res) => {
-        const { data } = res.data;
-        return data;
-      })
-      .catch((err) => {
-        throw err.response.data;
-      });
+    try {
+      const res = await axios.get(`http://${backendIp}:5000/users/${id}`);
+      return res.data.data;
+    } catch (err) {
+      throw err.response?.data || err;
+    }
   });
 };
 
-export const useCreateUser = async ({ user, uid }) => {
-  return axios
-    .post(`http://${backendIp}:5000/users/createUser`, {
+export const createUser = async ({ user, uid }) => {
+  try {
+    const res = await axios.post(`http://${backendIp}:5000/users`, {
       user,
       uid,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
     });
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
 
-export const useUpdateUser = async ({ id, user }) => {
-  return axios
-    .post(`http://${backendIp}:5000/users/updateUser`, {
-      id,
-      user,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+export const updateUser = async ({ id, user }) => {
+  try {
+    const res = await axios.patch(`http://${backendIp}:5000/users/${id}`, user);
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
 
-export const useUpdateUserWeight = async ({
+export const updateUserWeight = async ({
   id,
   currentWeight,
   startWeight,
   weightGoal,
   weightLog,
 }) => {
-  return axios
-    .post(`http://${backendIp}:5000/users/updateWeight`, {
-      id,
-      currentWeight,
-      startWeight,
-      weightGoal,
-      weightLog,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+  try {
+    const res = await axios.patch(
+      `http://${backendIp}:5000/users/${id}/weight`,
+      {
+        currentWeight,
+        startWeight,
+        weightGoal,
+        weightLog,
+      }
+    );
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
 
-export const useUpdateCalorieGoal = async ({ id, calorieGoal }) => {
-  return axios
-    .post(`http://${backendIp}:5000/users/updateCalorieGoal`, {
-      id,
-      calorieGoal,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+export const updateCalorieGoal = async ({ id, calorieGoal }) => {
+  try {
+    const res = await axios.patch(
+      `http://${backendIp}:5000/users/${id}/calorie-goal`,
+      {
+        calorieGoal,
+      }
+    );
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
-
-// BOILDERPLATE API Call GET
-// export const name = () => {
-//   return useQuery(["name"], async () => {
-//     return await axios
-//       .post(`http://${backendIp}:5000/meals/name`, {})
-//       .then((res) => {
-//         const { data } = res.data;
-//         return data;
-//       })
-//       .catch((err) => {
-//         throw err.response.data;
-//       });
-//   });
-// };
-
-// BOILERPLATE API Call POST
-// export const name = async ({}) => {
-//   return axios
-//     .post(`http://${backendIp}:5000/meals/name`, {})
-//     .then((res) => {
-//       const { data } = res.data;
-//       return data;
-//     })
-//     .catch((err) => {
-//       throw err.response.data;
-//     });
-// };

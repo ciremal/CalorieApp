@@ -1,158 +1,116 @@
 import axios from "axios";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const backendIp = process.env.EXPO_PUBLIC_BACKEND_IP;
 
 export const useGetMeals = () => {
   return useQuery(["getMeals"], async () => {
-    return await axios
-      .get(`http://${backendIp}:5000/meals/getMeals`)
-      .then((res) => res.data);
+    try {
+      const res = await axios.get(`http://${backendIp}:5000/meals`);
+      return res.data.data;
+    } catch (err) {
+      throw err.response?.data || err;
+    }
   });
 };
 
 export const useGetMealsByDateAndUser = (date, user) => {
   return useQuery(["getMealsByDateAndUser", date, user], async () => {
-    return await axios
-      .post(`http://${backendIp}:5000/meals/getMealsByDateAndUser`, {
-        date,
-        user,
-      })
-      .then((res) => {
-        const { data } = res.data;
-        return data;
-      })
-      .catch((err) => {
-        throw err.response.data;
-      });
+    try {
+      const res = await axios.get(
+        `http://${backendIp}:5000/meals/by-date-user`,
+        {
+          params: { date, user },
+        }
+      );
+      return res.data.data;
+    } catch (err) {
+      throw err.response?.data || err;
+    }
   });
 };
 
 export const useGetMealById = (id) => {
   return useQuery(["getMealById", id], async () => {
-    return await axios
-      .post(`http://${backendIp}:5000/meals/getMealById`, { id })
-      .then((res) => {
-        const { data } = res.data;
-        return data;
-      })
-      .catch((err) => {
-        throw err.response.data;
-      });
+    try {
+      const res = await axios.get(`http://${backendIp}:5000/meals/${id}`);
+      return res.data.data;
+    } catch (err) {
+      throw err.response?.data || err;
+    }
   });
 };
 
-export const useCreateMeal = async ({ title, user, createdAt }) => {
-  return axios
-    .post(`http://${backendIp}:5000/meals/createMeal`, {
+export const createMeal = async ({ title, user, createdAt }) => {
+  try {
+    const res = await axios.post(`http://${backendIp}:5000/meals`, {
       title,
       createdAt,
       user,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
     });
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
 
-export const useDeleteMeal = async (id) => {
-  return axios
-    .post(`http://${backendIp}:5000/meals/deleteMeal`, { id })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+export const deleteMeal = async (id) => {
+  try {
+    const res = await axios.delete(`http://${backendIp}:5000/meals/${id}`);
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
 
-export const useDeleteFoodItem = async ({ mealId, foodId }) => {
-  return axios
-    .post(`http://${backendIp}:5000/meals/deleteMealFoodItem`, {
-      mealId,
-      foodId,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+export const deleteFoodItem = async ({ mealId, foodId }) => {
+  try {
+    const res = await axios.patch(
+      `http://${backendIp}:5000/meals/${mealId}/food-items/${foodId}`
+    );
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
 
-export const useUpdateMealAddFoodItem = async ({
+export const updateMealAddFoodItem = async ({
   id,
   foodItem,
   mainNutrients,
 }) => {
-  return axios
-    .post(`http://${backendIp}:5000/meals/updateMealAddFoodItem`, {
-      id,
-      foodItem,
-      mainNutrients,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+  try {
+    const res = await axios.patch(
+      `http://${backendIp}:5000/meals/${id}/add-food-item`,
+      {
+        foodItem,
+        mainNutrients,
+      }
+    );
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
 
-export const useUpdateFoodItem = async ({
+export const updateFoodItem = async ({
   id,
   foodItemId,
   foodItem,
   mainNutrients,
   oldMainNutrients,
 }) => {
-  return axios
-    .post(`http://${backendIp}:5000/meals/updateFoodItem`, {
-      id,
-      foodItemId,
-      foodItem,
-      mainNutrients,
-      oldMainNutrients,
-    })
-    .then((res) => {
-      const { data } = res.data;
-      return data;
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+  try {
+    const res = await axios.patch(
+      `http://${backendIp}:5000/meals/${id}/update-food-item/${foodItemId}`,
+      {
+        foodItem,
+        mainNutrients,
+        oldMainNutrients,
+      }
+    );
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
 };
-
-// BOILDERPLATE API Call GET
-// export const name = () => {
-//   return useQuery(["name"], async () => {
-//     return await axios
-//       .post(`http://${backendIp}:5000/meals/name`, {})
-//       .then((res) => {
-//         const { data } = res.data;
-//         return data;
-//       })
-//       .catch((err) => {
-//         throw err.response.data;
-//       });
-//   });
-// };
-
-// BOILERPLATE API Call POST
-// export const name = async ({}) => {
-//   return axios
-//     .post(`http://${backendIp}:5000/meals/name`, {})
-//     .then((res) => {
-//       const { data } = res.data;
-//       return data;
-//     })
-//     .catch((err) => {
-//       throw err.response.data;
-//     });
-// };
